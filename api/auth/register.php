@@ -37,7 +37,7 @@
 
             //register user if not registered already
             try {
-                $query = "INSERT INTO users (userID, name, surname, username, email, password) VALUES ('" . $userID . "', '" . $name . "', '" . $surname . "', '" . $username . "', '" . $email . "', '" . $password . "')";
+                $query = "INSERT INTO users (user_id, name, surname, username, email, password) VALUES ('" . $userID . "', '" . $name . "', '" . $surname . "', '" . $username . "', '" . $email . "', '" . $password . "')";
                 $result = Database::queryDatabase($query);
 
                 $message = "New user successfully registered";

@@ -6,7 +6,7 @@
         //This will receive json from the front end and handle posting the item
         public static function postItem($json) {
             //convert the json into an associative array
-            $item = json_encode($json,true);
+            $item = json_decode($json,true);
 
             //get the variables from the json
             $itemID = $item['itemID'];
@@ -25,27 +25,30 @@
 
             //for response
             $is_success = false;
+            $item_exist = Utility::checkItemExist($itemID,"item");
+
+            if ($item_exist) {
+                return new Response(false,"Item already exists");
+            }
 
             //just insert the post details into the database
-            $query = "INSERT INTO items VALUES(" .
-                        $itemID . "," .
-                        $userID . "," .
-                        "'" . $datePosted . "'," .
-                        "'" . $itemName . "'," .
-                        "'" . $itemDescription . "'," .
-                        "'" . $condition . "'," .
-                        "'" . $sellerLocation . "'," .
-                        "'" . $stockStatus . "'," .
-                        $quantity . "," .
-                        $price . "," .
-                        $averageRating . "," .
-                        "'" . $itemImage . "'" .
+            $query = "INSERT INTO item (item_id, user_id, date_posted, item_name, item_description, item_condition, location, status, stock_amount, item_price) VALUES (" .
+                    "'" . $itemID . "'," .
+                    "'" . $userID . "'," .
+                    "'" . $datePosted . "'," .
+                    "'" . $itemName . "'," .
+                    "'" . $itemDescription . "'," .
+                    "'" . $condition . "'," .
+                    "'" . $sellerLocation . "'," .
+                    "'" . $stockStatus . "'," .
+                    $quantity . "," .
+                    $price .
                     ")";
 
             try {
                 $result = Database::queryDatabase($query);
 
-                if (!result) {
+                if (!$result) {
                     return new Response($is_success, "Failed to post item");
                 } else {
                     $is_success = true;
@@ -59,11 +62,11 @@
 
         public static function updateItem($json) {
             //convert the json into an associative array
-            $item = json_encode($json,true);
+            $item = json_decode($json,true);
 
             //Assign properties to a real name
             $itemID = $item['itemID'];
-            $seller = $item['seller'];
+            $seller = $item['seller']; //because seller is an object
             $userID = $seller['userID'];
             $datePosted = $item['datePosted'];
             $itemName = $item['itemName'];
@@ -79,19 +82,23 @@
             //for response
             $is_success = false;
 
-            $query = "UPDATE items SET 
-                        sellerID = " . $userID . ",
-                        datePosted = '" . $datePosted . "',
-                        itemName = '" . $itemName . "',
-                        itemDescription = '" . $itemDescription . "',
-                        `condition` = '" . $condition . "',
-                        sellerLocation = '" . $sellerLocation . "',
-                        stockStatus = '" . $stockStatus . "',
-                        quantity = " . $quantity . ",
-                        price = " . $price . ",
-                        averageRating = " . $averageRating . ",
-                            itemImage = '" . $itemImage . "'
-                        WHERE itemID = " . $itemID;
+          $query = "UPDATE item SET
+                    user_id = '" . $userID . "',
+                    date_posted = '" . $datePosted . "',
+                    item_name = '" . $itemName . "',
+                    item_description = '" . $itemDescription . "',
+                    item_condition = '" . $condition . "',
+                    location = '" . $sellerLocation . "',
+                    status = '" . $stockStatus . "',
+                    stock_amount = " . $quantity . ",
+                    item_price = " . $price . "
+                    WHERE item_id = '" . $itemID . "'";
+
+            $item_exist = Utility::checkItemExist($itemID,"item");
+
+            if (!$item_exist) {
+                return new Response(false, "Item to update not found");
+            }
 
             try {
                 $result = Database::queryDatabase($query);
@@ -107,13 +114,20 @@
         }
 
         public static function deleteItem($itemID) {
+
+            $item_exist = Utility::checkItemExist($itemID,"item");
+
+            if (!$item_exist) {
+                return new Response(false, "Item to delete not found");
+            }
+
             try {
                 $is_success = false;
 
-                $query = "DELETE * FROM items WHERE item_id =" .$itemID;
-                Database::queryDatabase($query);
+                $query = "DELETE FROM item WHERE item_id = '" . $itemID . "'";
+                $result = Database::queryDatabase($query);
 
-                if (!result) {
+                if (!$result) {
                     return new Response($is_success, "Failed to post item");
                 } else {
                     $is_success = true;
@@ -129,14 +143,15 @@
             try {
                 $is_success = false;
 
-                $query = "SELECT * FROM items WHERE item_id = ".$itemID;
+                $query = "SELECT * FROM item WHERE item_id = '" . $itemID . "'";
                 $result = Database::queryDatabase($query);
 
-                if (!result) {
+                if (!$result) {
                     return null; //item not found
                 } else {
                     $rows = pg_fetch_all($result);
                     $item_details = json_encode($rows);
+                    return $item_details;
                 }
             } catch (Exception $e) {
                 return null;

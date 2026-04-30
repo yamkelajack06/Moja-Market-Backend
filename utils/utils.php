@@ -1,10 +1,10 @@
 <?php
-    require_once __DIR__ . '/../response/auth.php';
+    require_once __DIR__ . '/../response/response.php';
     class Utility {
         //Runs DB query to check if user exists or not for registering
         public static function checkUserExists(string $username, string $email) {
             $is_found = false;
-            $query = "SELECT EXISTS (SELECT * FROM users WHERE username = '" . $username . "' OR email = '" . $email . "')";
+            $query = "SELECT EXISTS (SELECT 1 FROM users WHERE username = '" . $username . "' OR email = '" . $email . "')";
             $result = Database::queryDatabase($query);
 
             if ($result != "") {
@@ -13,10 +13,10 @@
 
                 if ($exists == 't') {
                     $is_found = true;
-                    return new AuthResponse($is_found, "User is already registered");
+                    return new Response($is_found, "User is already registered");
                 }
 
-                return new AuthResponse($is_found, "User does not exist");
+                return new Response($is_found, "User does not exist");
             }
         }
 
@@ -38,5 +38,17 @@
             } else {
                 throw new ErrorException("Database query failed");
             }
+        }
+
+        public static function checkItemExist(string $item_id, string $table) {
+            $query = "SELECT EXISTS (SELECT 1 FROM " . $table . " WHERE item_id = '" . $item_id . "')";
+            $result = Database::queryDatabase($query);
+
+            if ($result) {
+                $rows = pg_fetch_all($result);
+                return $rows[0]['exists'] === 't';
+            }
+
+            return false;
         }
     }

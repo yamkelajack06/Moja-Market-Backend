@@ -2,44 +2,73 @@
    require_once __DIR__ . '/config/db.php';
    require_once __DIR__ . '/api/auth/login.php';
    require_once __DIR__ . '/api/auth/register.php';
+   require_once __DIR__ . '/api/listings/post_item.php';
 
-//functions for testing logic
-//    function readInput() {
-//     $name     = readline("Enter name: ");
-//     $surname  = readline("Enter surname: ");
-//     $username = readline("Enter username: ");
-//     $email    = readline("Enter email: ");
-//     $password = readline("Enter password: ");
-//     $userID   = uniqid('user_', true);
+//test register
+$registerJson = json_encode([
+    'userID'   => 'user_99999',
+    'name'     => 'Yamkela',
+    'surname'  => 'Jack',
+    'username' => 'jack1011',
+    'email'    => 'yamkelajack101@gmail.com',
+    'password' => 'jack101@123'
+]);
 
-//     return json_encode([
-//         'userID'   => $userID,
-//         'name'     => $name,
-//         'surname'  => $surname,
-//         'username' => $username,
-//         'email'    => $email,
-//         'password' => $password
-//     ]);
-// }
+$register = Register::registerUser($registerJson);
+echo "REGISTER: " . $register->getMessage() . PHP_EOL;
 
-// $json = json_encode([
-//     'userID'   => 'user_' . bin2hex(random_bytes(16)),
-//     'name'     => 'Yamkela',
-//     'surname'  => 'Jack',
-//     'username' => 'jack1011',
-//     'email'    => 'yamkelajack101@gmail.com',
-//     'password' => 'jack101@123'
-// ]);
+//test login
+$login = Login::login('yamkelajack101@gmail.com', 'jack101@123');
+echo "LOGIN: " . $login->getMessage() . PHP_EOL;
 
+//test post item
+$Item = json_encode([
+    'itemID' => 'item_123456',
+    'seller' => [
+        'userID' => 'user_99999'
+    ],
+    'datePosted' => '2026-04-30 20:00:00',
+    'itemName' => 'Samsung Galaxy S21',
+    'itemDescription' => 'Lightly used, no cracks, everything works perfectly',
+    'condition' => 'Used',
+    'sellerLocation' => 'Johannesburg',
+    'stockStatus' => 'In Stock',
+    'quantity' => 1,
+    'price' => 7500,
+    'averageRating' => 4.6,
+    'itemImage' => 's21.jpg'
+]);
 
-// $user = json_decode($json,true);
+$post = ItemDatabase::postItem($Item);
+echo "POST: " . $post->getMessage() . PHP_EOL;
 
-// $email = $user['email'];
-// $username = $user['username'];
-// $password = $user['password'];
+//test update item
+$newItem = json_encode([
+    'itemID' => 'item_123456',
+    'seller' => [
+        'userID' => 'user_99999'
+    ],
+    'datePosted' => '2026-04-30 20:10:00',
+    'itemName' => 'Samsung Galaxy S21 Ultra',
+    'itemDescription' => 'Updated listing, includes case and charger',
+    'condition' => 'Like New',
+    'sellerLocation' => 'Sandton',
+    'stockStatus' => 'In Stock',
+    'quantity' => 1,
+    'price' => 9500,
+    'averageRating' => 4.9,
+    'itemImage' => 's21ultra.jpg'
+]);
 
-// $login = Login::login($email,$password);
+$update = ItemDatabase::updateItem($newItem);
+echo "UPDATE: " . $update->getMessage() . PHP_EOL;
 
-// echo $login -> getMessage();
+//test get item
+$itemID = 'item_123456';
 
-   
+$getDetails = ItemDatabase::getItemDetails($itemID);
+echo "GET: " . json_encode($getDetails) . PHP_EOL;
+
+//test delete
+$delete = ItemDatabase::deleteItem($itemID);
+echo "DELETE: " . $delete->getMessage() . PHP_EOL;
