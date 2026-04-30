@@ -157,4 +157,21 @@
                 return null;
             }
         }
+
+        public function getFeed() {
+            try {
+                $query = "SELECT * FROM item";
+                $result = Database::queryDatabase($query);
+
+                if ($result) {
+                    $rows = pg_fetch_all($rows);
+                    return json_encode($row);
+                } else {
+                    return json_encode([]);
+                }
+
+            } catch (Exception $e) {
+                return new Exception($e -> getMessage());
+            }
+        }
     }

@@ -2,7 +2,7 @@
    require_once __DIR__ . '/config/db.php';
    require_once __DIR__ . '/api/auth/login.php';
    require_once __DIR__ . '/api/auth/register.php';
-   require_once __DIR__ . '/api/listings/post_item.php';
+   require_once __DIR__ . '/api/posts/items.php';
 
 //test register
 $registerJson = json_encode([
@@ -70,5 +70,5 @@ $getDetails = ItemDatabase::getItemDetails($itemID);
 echo "GET: " . json_encode($getDetails) . PHP_EOL;
 
 //test delete
-$delete = ItemDatabase::deleteItem($itemID);
-echo "DELETE: " . $delete->getMessage() . PHP_EOL;
+// $delete = ItemDatabase::deleteItem($itemID);
+// echo "DELETE: " . $delete->getMessage() . PHP_EOL;
