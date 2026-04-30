@@ -2,22 +2,44 @@
 require_once 'config.php';
 
 class Database {
-    private $conn;
+    private static $conn;
+    private static $connString;
 
-    public function connect() {
+    public static function setConnectionString() {
+        self::$connString = "host=" . DB_HOST . " port=" . DB_PORT . " dbname=" . DB_NAME . " user=" . DB_USER . " password=" . DB_PASS . " sslmode=require";
+    }
+
+    public static function connect() {
         try {
-            $connString = "host=" . DB_HOST . " port=" . DB_PORT . " dbname=" . DB_NAME . " user=" . DB_USER . " password=" . DB_PASS . " sslmode=require";
-            $this->conn = pg_connect($connString);
+            self::setConnectionString();
 
-            if (!$this->conn) {
-                throw new Exception("Connection failed: " . pg_last_error());
+            self::$conn = @pg_connect(self::$connString);
+
+            if (!self::$conn) {
+                throw new Exception("Connection failed.");
             }
 
             echo "Database connection successful";
-            return $this->conn;
+            return self::$conn;
 
         } catch (Exception $e) {
             die("Database error: " . $e->getMessage());
+        }
+    }
+
+    //fetching data from table
+    public static function queryDatabase(string $query) {
+        try {
+            $result = pg_query(self::$conn, $query);
+
+            if (!$result) {
+                throw new Exception(pg_last_error(self::$conn));
+            }
+
+            return $result;
+
+        } catch (Exception $e) {
+            die("Query error: " . $e->getMessage());
         }
     }
 }
