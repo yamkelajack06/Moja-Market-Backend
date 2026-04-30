@@ -1,25 +1,24 @@
 <?php
+    require_once __DIR__ . '/../response/auth.php';
     class Utility {
         //Runs DB query to check if user exists or not for registering
-        public static function checkUserExists(string $email, string $username) {
+        public static function checkUserExists(string $username, string $email) {
             $is_found = false;
             $query = "SELECT EXISTS (SELECT * FROM users WHERE username = '" . $username . "' OR email = '" . $email . "')";
             $result = Database::queryDatabase($query);
 
-            //Handle database query responses
-            if ($result) {
+            if ($result != "") {
                 $rows = pg_fetch_all($result);
-                $res = json_encode($rows[0]);
+                $exists = $rows[0]['exists'];
 
-                if ($res == 't') {
+                if ($exists == 't') {
                     $is_found = true;
+                    return new AuthResponse($is_found, "User is already registered");
                 }
-            } else {
-                throw ErrorException("Database query failed");
-            }
 
-            return $is_found;
-        } 
+                return new AuthResponse($is_found, "User does not exist");
+            }
+        }
 
         //Runs db query to check if user login details match any user in the database
         public static function getUser(string $loginID, string $password) {
@@ -33,7 +32,7 @@
                 $res = json_encode($rows[0]);
                 return $res;
             } else {
-                throw ErrorException("Database query failed");
+                throw new ErrorException("Database query failed");
             }
         }
     }

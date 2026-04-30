@@ -23,14 +23,16 @@
 
             //check if user is registered to ensure user uniqueness
             try {
-                $is_registered = Utility::checkUserExists($username,$email);
+                $is_registered = Utility::checkUserExists($username,$email)-> getSuccess();
 
                 //throw error if user is already registered
                 if ($is_registered) {
-                    throw new ErrorException("User already exists. User a different email and/or username");
+                    $message = "User already exists. User a different email and/or username";
+                    return new AuthResponse($success,$message);
                 }
             } catch (Exception $e) {
-                echo $e -> getMessage();
+                $message = $e -> getMessage();
+                return new AuthResponse($success,$message);
             }
 
             //register user if not registered already
@@ -43,6 +45,7 @@
 
             } catch (Exception $e) {
                 $message = $e -> getMessage();
+                return new AuthResponse($success,$message);
             }
 
             return new AuthResponse($success,$message);

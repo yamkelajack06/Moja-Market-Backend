@@ -9,10 +9,10 @@
         }
 
         public function getSuccess() {
-            return $success;
+            return $this -> success;
         }
 
         public function getMessage() {
-            return $message;
+            return $this -> message;
         }
     }
