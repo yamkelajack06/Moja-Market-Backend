@@ -7,7 +7,6 @@ class Database {
     public function connect() {
         try {
             $connString = "host=" . DB_HOST . " port=" . DB_PORT . " dbname=" . DB_NAME . " user=" . DB_USER . " password=" . DB_PASS . " sslmode=require";
-
             $this->conn = pg_connect($connString);
 
             if (!$this->conn) {
