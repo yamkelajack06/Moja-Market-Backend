@@ -3,7 +3,7 @@
         //Runs DB query to check if user exists or not for registering
         public static function checkUserExists(string $email, string $username) {
             $is_found = false;
-            $query = "SELECT EXISTS (SELECT * FROM user WHERE username = '$username' OR email = '$email');";
+            $query = "SELECT EXISTS (SELECT * FROM users WHERE username = '" . $username . "' OR email = '" . $email . "')";
             $result = Database::queryDatabase($query);
 
             //Handle database query responses
@@ -24,7 +24,7 @@
         //Runs db query to check if user login details match any user in the database
         public static function getUser(string $loginID, string $password) {
             $is_valid = false;
-            $query = "SELECT * FROM user WHERE (username = '$loginID' OR email = '$loginID') AND password = '$password'";
+            $query = "SELECT * FROM users WHERE (username = '" . $loginID . "' OR email = '" . $loginID . "') AND password = '" . $password . "'";
 
             $result = Database::queryDatabase($query);
 

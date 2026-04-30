@@ -7,13 +7,12 @@ class Database {
 
     public static function setConnectionString() {
         self::$connString = "host=" . DB_HOST . " port=" . DB_PORT . " dbname=" . DB_NAME . " user=" . DB_USER . " password=" . DB_PASS . " sslmode=require";
+        self::$conn = @pg_connect(self::$connString);
     }
 
     public static function connect() {
         try {
             self::setConnectionString();
-
-            self::$conn = @pg_connect(self::$connString);
 
             if (!self::$conn) {
                 throw new Exception("Connection failed.");
@@ -30,6 +29,7 @@ class Database {
     //fetching data from table
     public static function queryDatabase(string $query) {
         try {
+            self::setConnectionString();
             $result = pg_query(self::$conn, $query);
 
             if (!$result) {

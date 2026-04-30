@@ -1,6 +1,6 @@
 <?php
-    require __DIR__  . '../../utils/utils.php';
-    require __DIC__ . '../../response/auth.php';
+    require_once __DIR__  . '/../../utils/utils.php';
+    require_once __DIR__ . '/../../response/auth.php';
 
     class Login {
         public static function login(string $loginID, $password) {
