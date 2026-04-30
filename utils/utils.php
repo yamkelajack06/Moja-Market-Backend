@@ -13,7 +13,7 @@
 
                 if ($exists == 't') {
                     $is_found = true;
-                    return new AuthResponse($is_found, "User is already registered");
+                    return new AuthResponse($is, "User is already registered");
                 }
 
                 return new AuthResponse($is_found, "User does not exist");
@@ -29,8 +29,12 @@
 
             if ($result) {
                 $rows = pg_fetch_all($result);
-                $res = json_encode($rows[0]);
-                return $res;
+
+                if (empty($rows)) {
+                    return null; // user not found
+                }
+
+                return json_encode($rows[0]);
             } else {
                 throw new ErrorException("Database query failed");
             }

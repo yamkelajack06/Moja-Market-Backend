@@ -25,12 +25,20 @@ $json = json_encode([
     'userID'   => 'user_' . bin2hex(random_bytes(16)),
     'name'     => 'Yamkela',
     'surname'  => 'Jack',
-    'username' => 'jack101',
+    'username' => 'jack1011',
     'email'    => 'yamkelajack101@gmail.com',
     'password' => 'jack101@123'
 ]);
 
-$operation = Register::registerUser($json);
-echo $operation -> getSuccess();
-echo $operation -> getMessage();
+
+$user = json_decode($json,true);
+
+$email = $user['email'];
+$username = $user['username'];
+$password = $user['password'];
+
+$login = Login::login($email,$password);
+
+echo $login -> getMessage();
+
    
