@@ -1,7 +1,7 @@
 <?php
     require_once __DIR__ . '/../../models/user.php';
     require_once __DIR__ . '/../../config/db.php';
-    require_once __DIR__ . '/../../response/auth.php';
+    require_once __DIR__ . '/../../response/response.php';
     require_once __DIR__ . '/../../utils/utils.php';
 
     class Register {
@@ -28,11 +28,11 @@
                 //throw error if user is already registered
                 if ($is_registered) {
                     $message = "User already exists. User a different email and/or username";
-                    return new AuthResponse($success,$message);
+                    return new Response($success,$message);
                 }
             } catch (Exception $e) {
                 $message = $e -> getMessage();
-                return new AuthResponse($success,$message);
+                return new Response($success,$message);
             }
 
             //register user if not registered already
@@ -45,9 +45,9 @@
 
             } catch (Exception $e) {
                 $message = $e -> getMessage();
-                return new AuthResponse($success,$message);
+                return new Response($success,$message);
             }
 
-            return new AuthResponse($success,$message);
+            return new Response($success,$message);
         }
     }

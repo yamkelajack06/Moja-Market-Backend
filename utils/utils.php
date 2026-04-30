@@ -13,7 +13,7 @@
 
                 if ($exists == 't') {
                     $is_found = true;
-                    return new AuthResponse($is, "User is already registered");
+                    return new AuthResponse($is_found, "User is already registered");
                 }
 
                 return new AuthResponse($is_found, "User does not exist");

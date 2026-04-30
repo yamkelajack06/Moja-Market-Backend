@@ -1,5 +1,5 @@
 <?php
-    class AuthResponse {
+    class Response {
         private bool $success;
         private string $message;
 
