@@ -42,6 +42,6 @@
                 $message = $e -> getMessage();
             }
 
-            return new RegisterResponse($success,$message);
+            return new AuthResponse($success,$message);
         }
     }

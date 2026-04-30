@@ -1,3 +1,25 @@
 <?php
+    require __DIR__  . '../../utils/utils.php';
+    require __DIC__ . '../../response/auth.php';
 
-?>
+    class Login {
+        public static function login(string $loginID, $password) {
+            $success = false;
+            $message = "";
+            try {
+                $user = Utility::getUser();
+                
+                if ($user == "{}") {
+                    $message = "Invalid login credentials";
+                } else {
+                    $success = true;
+                    $message = "Login successful";
+                }
+
+            } catch (Exception $e) {
+                $message = $e -> getMessage();  
+            }
+
+            return new AuthResponse($success,$message);
+        }
+    }
