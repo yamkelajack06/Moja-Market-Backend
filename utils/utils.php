@@ -41,8 +41,8 @@
         }
 
         //checks if a post with the same ID already exists just in case to prevent duplication
-        public static function checkItemExist(string $item_id, string $table) {
-            $query = "SELECT EXISTS (SELECT 1 FROM " . $table . " WHERE item_id = '" . $item_id . "')";
+        public static function checkItemExist(string $item_id, string $table, string $id) {
+            $query = "SELECT EXISTS (SELECT 1 FROM " . $table . " WHERE " . $id . " = '" . $item_id . "')";
             $result = Database::queryDatabase($query);
 
             if ($result) {

@@ -25,7 +25,7 @@
 
             //for response
             $is_success = false;
-            $item_exist = Utility::checkItemExist($itemID,"item");
+            $item_exist = Utility::checkItemExist($itemID,"item","item_id");
 
             if ($item_exist) {
                 return new Response(false,"Item already exists");
@@ -94,7 +94,7 @@
                     item_price = " . $price . "
                     WHERE item_id = '" . $itemID . "'";
 
-            $item_exist = Utility::checkItemExist($itemID,"item");
+            $item_exist = Utility::checkItemExist($itemID,"item","item_id");
 
             if (!$item_exist) {
                 return new Response(false, "Item to update not found");
@@ -115,7 +115,7 @@
 
         public static function deleteItem($itemID) {
 
-            $item_exist = Utility::checkItemExist($itemID,"item");
+            $item_exist = Utility::checkItemExist($itemID,"item","item_id");
 
             if (!$item_exist) {
                 return new Response(false, "Item to delete not found");

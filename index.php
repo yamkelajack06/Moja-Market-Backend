@@ -3,6 +3,7 @@
    require_once __DIR__ . '/api/auth/login.php';
    require_once __DIR__ . '/api/auth/register.php';
    require_once __DIR__ . '/api/posts/items.php';
+   require_once __DIR__ . '/api/posts/wants.php';
 
 //test register
 $registerJson = json_encode([
@@ -40,7 +41,7 @@ $Item = json_encode([
 ]);
 
 $post = ItemDatabase::postItem($Item);
-echo "POST: " . $post->getMessage() . PHP_EOL;
+echo "POST ITEM: " . $post->getMessage() . PHP_EOL;
 
 //test update item
 $newItem = json_encode([
@@ -72,3 +73,45 @@ echo "GET: " . json_encode($getDetails) . PHP_EOL;
 //test delete
 // $delete = ItemDatabase::deleteItem($itemID);
 // echo "DELETE: " . $delete->getMessage() . PHP_EOL;
+
+//test post want
+$want = json_encode([
+    'id' => 'want_123456',
+    'buyer' => [
+        'userID' => 'user_99999'
+    ],
+    'datePosted' => '2026-04-30 20:00:00',
+    'item' => 'JBL Speakers',
+    'description' => 'Looking for pre owned JBL speakers',
+    'budget' => 1200,
+    'wantStatus' => true
+]);
+
+$postWant = WantsDatabase::postWantRequest($want);
+echo "POST WANT: " . $postWant->getMessage() . PHP_EOL;
+
+//test update want
+$newWant = json_encode([
+    'id' => 'want_123456',
+    'buyer' => [
+        'userID' => 'user_99999'
+    ],
+    'datePosted' => '2026-04-30 20:10:00',
+    'item' => 'JBL Speakers Xtreme',
+    'description' => 'Updated - looking for JBL Xtreme specifically',
+    'budget' => 1500,
+    'wantStatus' => true
+]);
+
+$updateWant = WantsDatabase::updateWantRequest($newWant);
+echo "UPDATE WANT: " . $updateWant->getMessage() . PHP_EOL;
+
+//test get want
+$wantID = 'want_123456';
+
+$getWant = WantsDatabase::getWantRequestDetails($wantID);
+echo "GET WANT: " . json_encode($getWant) . PHP_EOL;
+
+//test delete want
+// $deleteWant = WantsDatabase::deleteWant($wantID);
+// echo "DELETE WANT: " . $deleteWant->getMessage() . PHP_EOL;

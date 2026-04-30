@@ -1,5 +1,4 @@
 <?php
-    require_once __DIR__ . '/../../models/user.php';
     require_once __DIR__ . '/../../config/db.php';
     require_once __DIR__ . '/../../response/response.php';
     require_once __DIR__ . '/../../utils/utils.php';
