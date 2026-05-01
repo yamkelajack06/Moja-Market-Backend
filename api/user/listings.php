@@ -4,7 +4,7 @@
     class UserListings {
         public static function getUserListings($user_id) {
             try {
-                $query = "SELECT * FROM item WHERE user_id =". $user_id ."";
+                $query = "SELECT * FROM item WHERE user_id = '" . $user_id . "'";   
                 $result = Database::queryDatabase($query);
 
                 if (!$result) {

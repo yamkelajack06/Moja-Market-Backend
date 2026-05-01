@@ -30,7 +30,7 @@ class Database {
     public static function queryDatabase(string $query) {
         try {
             self::setConnectionString();
-            $result = pg_query(self::$conn, $query);
+            $result = @pg_query(self::$conn, $query);
 
             if (!$result) {
                 throw new Exception(pg_last_error(self::$conn));

@@ -178,7 +178,7 @@
             }
         }
 
-        public function getFeed() {
+        public static function getFeed() {
             try {
                 $query = "SELECT * FROM item";
                 $result = Database::queryDatabase($query);
