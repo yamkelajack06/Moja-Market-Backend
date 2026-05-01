@@ -46,27 +46,25 @@
                     $quantity . "," .
                     $price .
                     ")";
-            
-            $imageQuery = "INSERT INTO Image (image_id, image_data, item_id) VALUES (" .
-            "'" . $imageID . "'," .
-            "'" . $imagePath . "'," .
-            "'" . $itemID . "'" .
-            ")";
-
             try {
-                //run the two database queries at once
                 $result = Database::queryDatabase($query);
-                $imageResult = Database::queryDatabase($imageQuery);
-
-                //if one if them or both fail then the post fails
-                if (!($result && $imageResult)) {
+        
+                if (!$result) {
                     return new Response($is_success, "Failed to post item");
-                    //TO DO Later: need some cleanup logic just in case on of them gets inserted into the database
 
                 } else {
+                    //Insert the image in the database after inserting the item is successful
+                    $imageResult = ItemDatabase::postImage($imageID, $imagePath,$itemID);
+
+                    //check if inserting the image is successful, if not just delete the item from the database
+                    if (!$imageResult -> getSuccess()) {
+                        ItemDatabase::deleteItem($itemID);
+                        return new Response($is_success, "Failed to post image");
+                    }
                     $is_success = true;
                 }
             } catch (Exception $e) {
+                
                 return new Response($is_success, "An error occurred: ".$e -> getMessage());  
             }
 
@@ -126,7 +124,11 @@
             }
         }
 
-        public static function deleteItem($itemID) {
+        public static function deleteItem($json) {
+            $item = json_decode($json,true);
+            $itemID = $item['itemID'];
+            $itemImage = $item['itemImage'];
+            $imageID = $itemImage['imageID'];
 
             $item_exist = Utility::checkItemExist($itemID,"item","item_id");
 
@@ -144,6 +146,7 @@
                     return new Response($is_success, "Failed to post item");
                 } else {
                     $is_success = true;
+                    ItemDatabase::deleteImage($imageID);
                 }
             } catch (Exception $e) {
                 return new Response($is_success, "An error occurred: ".$e -> getMessage());
@@ -156,7 +159,11 @@
             try {
                 $is_success = false;
 
-                $query = "SELECT * FROM item WHERE item_id = '" . $itemID . "'";
+                $query = "SELECT item.*, Image.image_id, Image.image_data 
+                        FROM item 
+                        JOIN Image ON item.item_id = Image.item_id 
+                        WHERE item.item_id = '" . $itemID . "'";
+                        
                 $result = Database::queryDatabase($query);
 
                 if (!$result) {
@@ -177,7 +184,7 @@
                 $result = Database::queryDatabase($query);
 
                 if ($result) {
-                    $rows = pg_fetch_all($rows);
+                    $rows = pg_fetch_all($result);
                     return json_encode($rows);
                 } else {
                     return json_encode([]);
@@ -189,84 +196,45 @@
         }
 
         public static function postImage($imageID, $imagePath, $itemID) {
-    try {
-        $query = "INSERT INTO Image (image_id, image_data, item_id) VALUES (" .
-            "'" . $imageID . "'," .
-            "'" . $imagePath . "'," .
-            "'" . $itemID . "'" .
-            ")";
+            try {
+                $query = "INSERT INTO Image (image_id, image_data, item_id) VALUES (" .
+                "'" . $imageID . "'," .
+                "'" . $imagePath . "'," .
+                "'" . $itemID . "'" .
+                ")";
 
-        $result = Database::queryDatabase($query);
+                $result = Database::queryDatabase($query);
 
-        if (!$result) {
-            return new Response(false, "Failed to post image");
+                if (!$result) {
+                    return new Response(false, "Failed to post image");
+                }
+
+                return new Response(true, "Image posted successfully");
+
+            } catch (Exception $e) {
+                return new Response(false, "An error occurred: " . $e->getMessage());
+            }
         }
 
-        return new Response(true, "Image posted successfully");
+        public static function deleteImage($imageID) {
+            try {
+                $image_exist = Utility::checkItemExist($imageID, "Image", "image_id");
 
-    } catch (Exception $e) {
-        return new Response(false, "An error occurred: " . $e->getMessage());
-    }
-}
+            if (!$image_exist) {
+                return new Response(false, "Image to delete not found");
+            }
 
-public static function updateImage($imageID, $imagePath) {
-    try {
-        $image_exist = Utility::checkItemExist($imageID, "Image", "image_id");
+            $query = "DELETE FROM Image WHERE image_id = '" . $imageID . "'";
+            $result = Database::queryDatabase($query);
 
-        if (!$image_exist) {
-            return new Response(false, "Image to update not found");
+            if (!$result) {
+                return new Response(false, "Failed to delete image");
+            }
+
+            return new Response(true, "Image deleted successfully");
+
+            } catch (Exception $e) {
+                return new Response(false, "An error occurred: " . $e->getMessage());
+            }
         }
-
-        $query = "UPDATE Image SET image_data = '" . $imagePath . "' WHERE image_id = '" . $imageID . "'";
-        $result = Database::queryDatabase($query);
-
-        if (!$result) {
-            return new Response(false, "Failed to update image");
-        }
-
-        return new Response(true, "Image updated successfully");
-
-    } catch (Exception $e) {
-        return new Response(false, "An error occurred: " . $e->getMessage());
-    }
-}
-
-public static function deleteImage($imageID) {
-    try {
-        $image_exist = Utility::checkItemExist($imageID, "Image", "image_id");
-
-        if (!$image_exist) {
-            return new Response(false, "Image to delete not found");
-        }
-
-        $query = "DELETE FROM Image WHERE image_id = '" . $imageID . "'";
-        $result = Database::queryDatabase($query);
-
-        if (!$result) {
-            return new Response(false, "Failed to delete image");
-        }
-
-        return new Response(true, "Image deleted successfully");
-
-    } catch (Exception $e) {
-        return new Response(false, "An error occurred: " . $e->getMessage());
-    }
-}
-
-public static function getImage($imageID) {
-    try {
-        $query = "SELECT * FROM Image WHERE image_id = '" . $imageID . "'";
-        $result = Database::queryDatabase($query);
-
-        if (!$result) {
-            return null;
-        }
-
-        $rows = pg_fetch_all($result);
-        return json_encode($rows);
-
-    } catch (Exception $e) {
-        return null;
-    }
-}
     }

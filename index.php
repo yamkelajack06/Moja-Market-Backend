@@ -37,7 +37,10 @@ $Item = json_encode([
     'quantity' => 1,
     'price' => 7500,
     'averageRating' => 4.6,
-    'itemImage' => 's21.jpg'
+    'itemImage' => [
+    'imageID' => 'image_123456',
+    'imagePath' => 's21.jpg'
+]
 ]);
 
 $post = ItemDatabase::postItem($Item);
@@ -58,7 +61,10 @@ $newItem = json_encode([
     'quantity' => 1,
     'price' => 9500,
     'averageRating' => 4.9,
-    'itemImage' => 's21ultra.jpg'
+    'itemImage' => [
+    'imageID' => 'image_123456',
+    'imagePath' => 's21.jpg'
+   ]
 ]);
 
 $update = ItemDatabase::updateItem($newItem);

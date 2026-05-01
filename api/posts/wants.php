@@ -145,7 +145,7 @@
                 $result = Database::queryDatabase($query);
 
                 if ($result) {
-                    $rows = pg_fetch_all($rows);
+                    $rows = pg_fetch_all($result);
                     return json_encode($rows);
                 } else {
                     return json_encode([]);
