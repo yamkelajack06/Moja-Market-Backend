@@ -39,7 +39,8 @@ class Database {
             return $result;
 
         } catch (Exception $e) {
-            die("Query error: " . $e->getMessage());
+            echo "Query error: " . $e->getMessage() . PHP_EOL;
+            return false;
         }
     }
 }
