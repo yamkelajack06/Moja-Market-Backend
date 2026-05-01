@@ -187,4 +187,86 @@
                 return new Exception($e -> getMessage());
             }
         }
+
+        public static function postImage($imageID, $imagePath, $itemID) {
+    try {
+        $query = "INSERT INTO Image (image_id, image_data, item_id) VALUES (" .
+            "'" . $imageID . "'," .
+            "'" . $imagePath . "'," .
+            "'" . $itemID . "'" .
+            ")";
+
+        $result = Database::queryDatabase($query);
+
+        if (!$result) {
+            return new Response(false, "Failed to post image");
+        }
+
+        return new Response(true, "Image posted successfully");
+
+    } catch (Exception $e) {
+        return new Response(false, "An error occurred: " . $e->getMessage());
+    }
+}
+
+public static function updateImage($imageID, $imagePath) {
+    try {
+        $image_exist = Utility::checkItemExist($imageID, "Image", "image_id");
+
+        if (!$image_exist) {
+            return new Response(false, "Image to update not found");
+        }
+
+        $query = "UPDATE Image SET image_data = '" . $imagePath . "' WHERE image_id = '" . $imageID . "'";
+        $result = Database::queryDatabase($query);
+
+        if (!$result) {
+            return new Response(false, "Failed to update image");
+        }
+
+        return new Response(true, "Image updated successfully");
+
+    } catch (Exception $e) {
+        return new Response(false, "An error occurred: " . $e->getMessage());
+    }
+}
+
+public static function deleteImage($imageID) {
+    try {
+        $image_exist = Utility::checkItemExist($imageID, "Image", "image_id");
+
+        if (!$image_exist) {
+            return new Response(false, "Image to delete not found");
+        }
+
+        $query = "DELETE FROM Image WHERE image_id = '" . $imageID . "'";
+        $result = Database::queryDatabase($query);
+
+        if (!$result) {
+            return new Response(false, "Failed to delete image");
+        }
+
+        return new Response(true, "Image deleted successfully");
+
+    } catch (Exception $e) {
+        return new Response(false, "An error occurred: " . $e->getMessage());
+    }
+}
+
+public static function getImage($imageID) {
+    try {
+        $query = "SELECT * FROM Image WHERE image_id = '" . $imageID . "'";
+        $result = Database::queryDatabase($query);
+
+        if (!$result) {
+            return null;
+        }
+
+        $rows = pg_fetch_all($result);
+        return json_encode($rows);
+
+    } catch (Exception $e) {
+        return null;
+    }
+}
     }
