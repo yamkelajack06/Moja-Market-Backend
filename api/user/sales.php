@@ -8,7 +8,7 @@
 
         }
 
-        public static function confirmSale() {
-            
-        }
+       public static function confirmSale() {
+        
+       }
     }
