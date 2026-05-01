@@ -22,6 +22,8 @@
             $price = $item['price'];
             $averageRating = $item['averageRating'];
             $itemImage = $item['itemImage'];
+            $imageID = $itemImage['imageID'];
+            $imagePath = $itemImage['imagePath'];
 
             //for response
             $is_success = false;
@@ -44,12 +46,23 @@
                     $quantity . "," .
                     $price .
                     ")";
+            
+            $imageQuery = "INSERT INTO Image (image_id, image_data, item_id) VALUES (" .
+            "'" . $imageID . "'," .
+            "'" . $imagePath . "'," .
+            "'" . $itemID . "'" .
+            ")";
 
             try {
+                //run the two database queries at once
                 $result = Database::queryDatabase($query);
+                $imageResult = Database::queryDatabase($imageQuery);
 
-                if (!$result) {
+                //if one if them or both fail then the post fails
+                if (!($result && $imageResult)) {
                     return new Response($is_success, "Failed to post item");
+                    //TO DO Later: need some cleanup logic just in case on of them gets inserted into the database
+
                 } else {
                     $is_success = true;
                 }
@@ -165,7 +178,7 @@
 
                 if ($result) {
                     $rows = pg_fetch_all($rows);
-                    return json_encode($row);
+                    return json_encode($rows);
                 } else {
                     return json_encode([]);
                 }

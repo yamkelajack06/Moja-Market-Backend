@@ -146,7 +146,7 @@
 
                 if ($result) {
                     $rows = pg_fetch_all($rows);
-                    return json_encode($row);
+                    return json_encode($rows);
                 } else {
                     return json_encode([]);
                 }
