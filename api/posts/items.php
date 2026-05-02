@@ -50,7 +50,7 @@
                 $result = Database::queryDatabase($query);
         
                 if (!$result) {
-                    return new Response($is_success, "Failed to post item");
+                    return new Response(false, "Failed to post item");
 
                 } else {
                     //Insert the image in the database after inserting the item is successful
@@ -59,16 +59,15 @@
                     //check if inserting the image is successful, if not just delete the item from the database
                     if (!$imageResult -> getSuccess()) {
                         ItemDatabase::deleteItem($itemID);
-                        return new Response($is_success, "Failed to post image");
+                        return new Response(false, "Failed to post image");
                     }
-                    $is_success = true;
                 }
             } catch (Exception $e) {
                 
-                return new Response($is_success, "An error occurred: ".$e -> getMessage());  
+                return new Response(false, "An error occurred: ".$e -> getMessage());  
             }
 
-            return new Response($is_success, "Item posted successfully");
+            return new Response(true, "Item posted successfully");
         }
 
         public static function updateItem($json) {
@@ -115,12 +114,11 @@
                 $result = Database::queryDatabase($query);
 
                 if ($result) {
-                    $is_success = true;
-                    return new Response($is_success, "Item updated successfully");
+                    return new Response(true, "Item updated successfully");
                 }
 
             } catch (Exception $e) {
-                return new Response($is_success, "An error occurred: " . $e->getMessage());
+                return new Response(false, "An error occurred: " . $e->getMessage());
             }
         }
 
@@ -137,28 +135,23 @@
             }
 
             try {
-                $is_success = false;
-
                 $query = "DELETE FROM item WHERE item_id = '" . $itemID . "'";
                 $result = Database::queryDatabase($query);
 
                 if (!$result) {
-                    return new Response($is_success, "Failed to post item");
+                    return new Response(false, "Failed to post item");
                 } else {
-                    $is_success = true;
                     ItemDatabase::deleteImage($imageID);
                 }
             } catch (Exception $e) {
-                return new Response($is_success, "An error occurred: ".$e -> getMessage());
+                return new Response(false, "An error occurred: ".$e -> getMessage());
             }
 
-            return new Response($is_success, "Item deleted successfully");
+            return new Response(true, "Item deleted successfully");
         }
 
         public static function getItemDetails($itemID) {
             try {
-                $is_success = false;
-
                 $query = "SELECT item.*, Image.image_id, Image.image_data 
                         FROM item 
                         JOIN Image ON item.item_id = Image.item_id 
@@ -167,14 +160,14 @@
                 $result = Database::queryDatabase($query);
 
                 if (!$result) {
-                    return null; //item not found
+                    return new Response(false, "Item not found");  //item not found
                 } else {
                     $rows = pg_fetch_all($result);
                     $item_details = json_encode($rows);
-                    return $item_details;
+                    return new Response(true, "Item found", $rows); 
                 }
             } catch (Exception $e) {
-                return null;
+                return new Response(false, $e -> getMessage());
             }
         }
 
@@ -185,13 +178,13 @@
 
                 if ($result) {
                     $rows = pg_fetch_all($result);
-                    return json_encode($rows);
+                    return new Response(true, "Feed loaded", $rows);
                 } else {
-                    return json_encode([]);
+                    return new Response(false, "Failed to load feed" []);
                 }
 
             } catch (Exception $e) {
-                return new Exception($e -> getMessage());
+                return new Response(false, $e -> getMessage());
             }
         }
 

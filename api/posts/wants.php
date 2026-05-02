@@ -39,14 +39,13 @@
 
                 if (!$result) {
                     return new Response($is_success, "Failed to post item");
-                } else {
-                    $is_success = true;
                 }
+
             } catch (Exception $e) {
-                return new Response($is_success, "An error occurred: ".$e -> getMessage());  
+                return new Response(false, "An error occurred: ".$e -> getMessage());  
             }
 
-            return new Response($is_success, "Item posted successfully");
+            return new Response(true, "Item posted successfully");
         }
 
         public static function updateWantRequest($json) {
@@ -62,9 +61,6 @@
             $description = $item['description'];
             $budget = $item['budget'];
             $wantStatus = $item['wantStatus'];
-
-            //for response
-            $is_success = false;
 
           $query = "UPDATE wantrequest SET
                 user_id = '" . $userID . "',
@@ -85,12 +81,11 @@
                 $result = Database::queryDatabase($query);
 
                 if ($result) {
-                    $is_success = true;
-                    return new Response($is_success, "Item updated successfully");
+                    return new Response(true, "Item updated successfully");
                 }
 
             } catch (Exception $e) {
-                return new Response($is_success, "An error occurred: " . $e->getMessage());
+                return new Response(false, "An error occurred: " . $e->getMessage());
             }
         }
 
@@ -110,32 +105,30 @@
 
                 if (!$result) {
                     return new Response($is_success, "Failed to post item");
-                } else {
-                    $is_success = true;
                 }
+
             } catch (Exception $e) {
-                return new Response($is_success, "An error occurred: ".$e -> getMessage());
+                return new Response(false, "An error occurred: ".$e -> getMessage());
             }
 
-            return new Response($is_success, "Item deleted successfully");
+            return new Response(true, "Item deleted successfully");
         }
 
         public static function getWantRequestDetails($wantsID) {
             try {
-                $is_success = false;
-
+        
                 $query = "SELECT * FROM wantrequest WHERE wants_id = '" . $wantsID . "'";
                 $result = Database::queryDatabase($query);
 
                 if (!$result) {
-                    return null; //item not found
+                    return new Response(false,"want request not found");
                 } else {
                     $rows = pg_fetch_all($result);
                     $want_request_details = json_encode($rows);
-                    return $want_request_details;
+                    return new Response(true, "Want request found",$rows);
                 }
             } catch (Exception $e) {
-                return null;
+                return new Response(false,$e -> getMessage());
             }
         }
 
@@ -146,13 +139,13 @@
 
                 if ($result) {
                     $rows = pg_fetch_all($result);
-                    return json_encode($rows);
+                    return new Response(true,"Want request feed loaded",$rows);
                 } else {
-                    return json_encode([]);
+                    return new Response(false,"Failed to load want request feed");
                 }
 
             } catch (Exception $e) {
-                return new Exception($e -> getMessage());
+                return new Response(false,$e -> getMessage());
             }
         }
     }

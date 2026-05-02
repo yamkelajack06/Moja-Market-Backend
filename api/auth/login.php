@@ -22,6 +22,6 @@
 
             }
 
-            return new Response($success,$message);
+            return new Response(true, "Login successful", json_decode($user, true));
         }
     }

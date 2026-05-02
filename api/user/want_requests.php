@@ -8,14 +8,14 @@
                 $result = Database::queryDatabase($query);
 
                 if (!$result) {
-                    return null; //want requests not found
+                    return new Response(false, "No want requests found"); //want requests not found
                 }
 
                 $rows = pg_fetch_all($result);
-                return json_encode($rows);
+                return new Response(true, "Want requests found", $rows);
 
             } catch (Exception $e) {
-                return null;
+                return new Response(false, $e->getMessage());
             }
         }
     }

@@ -5,10 +5,9 @@
     class ImageUpload {
 
         public static function uploadImage() {
-            $success = false;
 
             if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-                return new Response($success, "No image received or upload error");
+                return new Response(false, "No image received or upload error");
             }
 
             $file     = $_FILES['image'];
@@ -20,12 +19,12 @@
             $mimeType     = mime_content_type($tmpPath);
 
             if (!in_array($mimeType, $allowedMimes)) {
-                return new Response($success, "Unsupported file type: " . $mimeType);
+                return new Response(false, "Unsupported file type: " . $mimeType);
             }
 
             // Cap file size at 10 MB
             if ($file['size'] > 10 * 1024 * 1024) {
-                return new Response($success, "File too large (max 10 MB)");
+                return new Response(false, "File too large (max 10 MB)");
             }
 
             $uploadDir = __DIR__ . '/../../uploads/';
@@ -39,11 +38,10 @@
             $destPath = $uploadDir . $safeName;
 
             if (!move_uploaded_file($tmpPath, $destPath)) {
-                return new Response($success, "Failed to save file");
+                return new Response(false, "Failed to save file");
             }
-
-            $success = true;
+            
             $publicUrl = '/uploads/' . $safeName;
-            return new Response($success, $publicUrl);
+            return new Response(true, $publicUrl);
         }
     }

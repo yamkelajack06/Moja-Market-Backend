@@ -26,12 +26,10 @@
 
                 //throw error if user is already registered
                 if ($is_registered) {
-                    $message = "User already exists. User a different email and/or username";
-                    return new Response($success,$message);
+                    return new Response(false, "User already exists. Use a different email and/or username");
                 }
             } catch (Exception $e) {
-                $message = $e -> getMessage();
-                return new Response($success,$message);
+                return new Response(false, $e->getMessage());
             }
 
             //register user if not registered already
@@ -39,14 +37,11 @@
                 $query = "INSERT INTO users (user_id, name, surname, username, email, password) VALUES ('" . $userID . "', '" . $name . "', '" . $surname . "', '" . $username . "', '" . $email . "', '" . $password . "')";
                 $result = Database::queryDatabase($query);
 
-                $message = "New user successfully registered";
-                $success = true;
-
             } catch (Exception $e) {
                 $message = $e -> getMessage();
-                return new Response($success,$message);
+                return new Response(false, $e->getMessage());
             }
 
-            return new Response($success,$message);
+            return new Response(true, "New user successfully registered");
         }
     }
