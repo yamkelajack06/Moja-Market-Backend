@@ -1,10 +1,11 @@
 FROM php:8.2-apache
 
-# Enable Apache modules needed for CORS and Routing
-RUN a2enmod headers rewrite
+# Enable rewrite and headers modules
+RUN a2enmod rewrite headers
 
-# Copy your source code to the container
+# Update Apache config to allow .htaccess overrides
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+
 COPY . /var/www/html/
 
-# Ensure the web server has permission to read the files
 RUN chown -R www-data:www-data /var/www/html
