@@ -2,6 +2,7 @@
     class Response {
         private bool $success;
         private string $message;
+        private array $data;
 
         function __construct(bool $success, string $message) {
             $this -> success = $success;
