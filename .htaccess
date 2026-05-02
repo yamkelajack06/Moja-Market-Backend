@@ -1,9 +1,7 @@
-# Force headers on all responses, including errors and preflights
 Header always set Access-Control-Allow-Origin "https://moja-market-web.vercel.app"
 Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
 Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
 
-# Handle OPTIONS preflight and exit with 200 OK immediately
 RewriteEngine On
 RewriteCond %{REQUEST_METHOD} OPTIONS
 RewriteRule ^(.*)$ $1 [R=200,L]
