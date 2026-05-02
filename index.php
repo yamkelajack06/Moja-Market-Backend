@@ -15,7 +15,7 @@ require_once __DIR__ . '/api/user/want_requests.php';
 // require_once __DIR__ . '/utils/image_upload.php';
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Origin: https://moja-market-web.vercel.app");
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
