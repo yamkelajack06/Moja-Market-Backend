@@ -57,8 +57,8 @@ switch ($path) {
 
     // Wants
     case 'api/posts/wants':
-        if ($method === 'POST')   echo json_encode(WantsDatabase::postWantRequest($body));
-        if ($method === 'PUT')    echo json_encode(WantsDatabase::updateWantRequest($body));
+        if ($method === 'POST') echo json_encode(WantsDatabase::postWantRequest($body));
+        if ($method === 'PUT') echo json_encode(WantsDatabase::updateWantRequest($body));
         if ($method === 'DELETE') {
             $data = json_decode($body, true);
             echo json_encode(WantsDatabase::deleteWantRequest($data['id']));
