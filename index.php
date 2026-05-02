@@ -1,13 +1,15 @@
 <?php
 ob_start();
-ini_set('display_errors', 1); 
+ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+// CORS headers set ONCE here only (removed from .htaccess)
 header("Access-Control-Allow-Origin: https://moja-market-web.vercel.app");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header('Content-Type: application/json');
 
+// Handle preflight before anything else
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -23,6 +25,7 @@ require_once __DIR__ . '/api/posts/wants.php';
 require_once __DIR__ . '/api/user/profile.php';
 require_once __DIR__ . '/api/user/listings.php';
 require_once __DIR__ . '/api/user/want_requests.php';
+require_once __DIR__ . '/api/upload/upload_image.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
