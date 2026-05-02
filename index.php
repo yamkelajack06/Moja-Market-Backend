@@ -1,6 +1,17 @@
 <?php
+ob_start();
 ini_set('display_errors', 1); 
 error_reporting(E_ALL);
+
+header("Access-Control-Allow-Origin: https://moja-market-web.vercel.app");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/response/response.php';
@@ -12,17 +23,6 @@ require_once __DIR__ . '/api/posts/wants.php';
 require_once __DIR__ . '/api/user/profile.php';
 require_once __DIR__ . '/api/user/listings.php';
 require_once __DIR__ . '/api/user/want_requests.php';
-// require_once __DIR__ . '/utils/image_upload.php';
-
-header('Content-Type: application/json');
-header("Access-Control-Allow-Origin: https://moja-market-web.vercel.app");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
