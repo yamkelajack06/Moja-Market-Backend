@@ -4,18 +4,12 @@
 
     class Login {
         public static function login(string $loginID, string $password) {
-            $success = false;
-            $message = "";
             try {
                 $user = Utility::getUser($loginID, $password);
                 
                 if ($user == "") {
-                    $message = "Invalid login credentials";
-                } else {
-                    $success = true;
-                    $message = "Login successful";
-                }
-
+                    return new Response(false, "Invalid login credentials");
+                } 
             } catch (Exception $e) {
                 $message = $e -> getMessage();
                 return new Response($success,$message);  
