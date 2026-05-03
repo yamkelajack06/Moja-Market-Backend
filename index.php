@@ -4,9 +4,9 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 if (!headers_sent()) {
-    header("Access-Control-Allow-Origin: https://moja-market-web.vercel.app");
+    header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
     header('Content-Type: application/json');
 }
 
@@ -49,63 +49,88 @@ switch ($path) {
         break;
 
     case 'api/auth/register':
-        $res = Register::registerUser($body);
-        echo json_encode($res->toArray());
+        if ($method === 'POST') {
+            $res = Register::registerUser($body);
+            echo json_encode($res->toArray());
+        }
         break;
 
     case 'api/auth/login':
-        $data = json_decode($body, true);
-        $res = Login::login($data['loginID'] ?? '', $data['password'] ?? '');
-        echo json_encode($res->toArray());
+        if ($method === 'POST') {
+            $data = json_decode($body, true);
+            $res = Login::login($data['loginID'] ?? '', $data['password'] ?? '');
+            echo json_encode($res->toArray());
+        }
         break;
 
     case 'api/posts/items':
-        if ($method === 'POST')   echo json_encode(ItemDatabase::postItem($body)->toArray());
-        if ($method === 'PUT')    echo json_encode(ItemDatabase::updateItem($body)->toArray());
-        if ($method === 'DELETE') echo json_encode(ItemDatabase::deleteItem($body)->toArray());
+        if ($method === 'POST') {
+            echo json_encode(ItemDatabase::postItem($body)->toArray());
+        } else if ($method === 'PUT') {
+            echo json_encode(ItemDatabase::updateItem($body)->toArray());
+        } else if ($method === 'DELETE') {
+            echo json_encode(ItemDatabase::deleteItem($body)->toArray());
+        }
         break;
 
     case 'api/posts/feed':
-        echo json_encode(ItemDatabase::getFeed()->toArray());
+        if ($method === 'GET') {
+            echo json_encode(ItemDatabase::getFeed()->toArray());
+        }
         break;
 
     case 'api/posts/item':
-        $itemID = $_GET['id'] ?? '';
-        echo json_encode(ItemDatabase::getItemDetails($itemID)->toArray());
+        if ($method === 'GET') {
+            $itemID = $_GET['id'] ?? '';
+            echo json_encode(ItemDatabase::getItemDetails($itemID)->toArray());
+        }
         break;
 
     case 'api/posts/wants':
-        if ($method === 'POST') echo json_encode(WantsDatabase::postWantRequest($body)->toArray());
-        if ($method === 'PUT')  echo json_encode(WantsDatabase::updateWantRequest($body)->toArray());
-        if ($method === 'DELETE') {
+        if ($method === 'POST') {
+            echo json_encode(WantsDatabase::postWantRequest($body)->toArray());
+        } else if ($method === 'PUT') {
+            echo json_encode(WantsDatabase::updateWantRequest($body)->toArray());
+        } else if ($method === 'DELETE') {
             $data = json_decode($body, true);
             echo json_encode(WantsDatabase::deleteWantRequest($data['id'] ?? '')->toArray());
         }
         break;
 
     case 'api/posts/wants/feed':
-        $db = new WantsDatabase();
-        echo json_encode($db->getWantRequestFeed()->toArray());
+        if ($method === 'GET') {
+            $db = new WantsDatabase();
+            echo json_encode($db->getWantRequestFeed()->toArray());
+        }
         break;
 
     case 'api/posts/want':
-        $wantID = $_GET['id'] ?? '';
-        echo json_encode(WantsDatabase::getWantRequestDetails($wantID)->toArray());
+        if ($method === 'GET') {
+            $wantID = $_GET['id'] ?? '';
+            echo json_encode(WantsDatabase::getWantRequestDetails($wantID)->toArray());
+        }
         break;
 
     case 'api/user/profile':
-        if ($method === 'GET') echo json_encode(UserProfile::getUserProfile($body)->toArray());
-        if ($method === 'PUT') echo json_encode(UserProfile::updateProfile($body)->toArray());
+        if ($method === 'GET') {
+            echo json_encode(UserProfile::getUserProfile($body)->toArray());
+        } else if ($method === 'PUT') {
+            echo json_encode(UserProfile::updateProfile($body)->toArray());
+        }
         break;
 
     case 'api/user/listings':
-        $userID = $_GET['user_id'] ?? '';
-        echo json_encode(UserListings::getUserListings($userID)->toArray());
+        if ($method === 'GET') {
+            $userID = $_GET['user_id'] ?? '';
+            echo json_encode(UserListings::getUserListings($userID)->toArray());
+        }
         break;
 
     case 'api/user/wants':
-        $userID = $_GET['user_id'] ?? '';
-        echo json_encode(WantRequest::getUserWantRequests($userID)->toArray());
+        if ($method === 'GET') {
+            $userID = $_GET['user_id'] ?? '';
+            echo json_encode(WantRequest::getUserWantRequests($userID)->toArray());
+        }
         break;
 
     default:
