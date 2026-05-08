@@ -1,47 +1,94 @@
 <?php
+
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/response/response.php';
+require_once __DIR__ . '/utils/utils.php';
+require_once __DIR__ . '/api/auth/register.php';
+require_once __DIR__ . '/api/auth/login.php';
+require_once __DIR__ . '/api/posts/items.php';
+require_once __DIR__ . '/api/posts/wants.php';
+require_once __DIR__ . '/api/user/profile.php';
+require_once __DIR__ . '/api/user/listings.php';
+require_once __DIR__ . '/api/user/want_requests.php';
+
 function route($method, $uri) {
     $path = parse_url($uri, PHP_URL_PATH);
 
+    header('Content-Type: application/json');
+
     switch ($path) {
+
         case '/api/auth/register':
-            require 'auth/register.php';
+            $json = file_get_contents('php://input');
+            echo json_encode(Register::registerUser($json)->toArray());
             break;
+
         case '/api/auth/login':
-            require 'auth/login.php';
+            $body     = json_decode(file_get_contents('php://input'), true);
+            $loginID  = $body['loginID']  ?? '';
+            $password = $body['password'] ?? '';
+            echo json_encode(Login::login($loginID, $password)->toArray());
             break;
+
         case '/api/posts/items':
-            require 'posts/items.php';
+            $json = file_get_contents('php://input');
+            echo json_encode(ItemDatabase::postItem($json)->toArray());
             break;
+
         case '/api/posts/feed':
-            require 'posts/feed.php';
+            echo json_encode(ItemDatabase::getFeed()->toArray());
             break;
+
         case '/api/posts/item':
-            require 'posts/item_detail.php';
+            $body   = json_decode(file_get_contents('php://input'), true);
+            $itemID = $body['itemID'] ?? '';
+            echo json_encode(ItemDatabase::getItemDetails($itemID)->toArray());
             break;
+
         case '/api/posts/wants':
-            require 'posts/wants_post.php';
+            $json = file_get_contents('php://input');
+            echo json_encode(WantsDatabase::postWantRequest($json)->toArray());
             break;
+
         case '/api/posts/wants/feed':
-            require 'posts/wants_feed.php';
+            echo json_encode((new WantsDatabase())->getWantRequestFeed()->toArray());
             break;
+
         case '/api/posts/want':
-            require 'posts/want_detail.php';
+            $body   = json_decode(file_get_contents('php://input'), true);
+            $wantID = $body['wantsID'] ?? '';
+            echo json_encode(WantsDatabase::getWantRequestDetails($wantID)->toArray());
             break;
+
         case '/api/user/profile':
-            require 'user/profile.php';
+            $json = file_get_contents('php://input');
+            $body = json_decode($json, true);
+            if (isset($body['name'])) {
+                echo json_encode(UserProfile::updateProfile($json)->toArray());
+            } else {
+                echo json_encode(UserProfile::getUserProfile($json)->toArray());
+            }
             break;
+
         case '/api/user/listings':
-            require 'user/listings.php';
+            $body   = json_decode(file_get_contents('php://input'), true);
+            $userID = $body['userID'] ?? '';
+            echo json_encode(UserListings::getUserListings($userID)->toArray());
             break;
+
         case '/api/user/wants':
-            require 'user/wants.php';
+            $body   = json_decode(file_get_contents('php://input'), true);
+            $userID = $body['userID'] ?? '';
+            echo json_encode(WantRequest::getUserWantRequests($userID)->toArray());
             break;
+
         case '/api/upload':
-            require 'upload.php';
+            require_once __DIR__ . '/api/upload/upload_image.php';
+            echo json_encode(ImageUpload::uploadImage()->toArray());
             break;
+
         default:
             http_response_code(404);
-            header('Content-Type: application/json');
             echo json_encode(["error" => "404 Not Found", "path" => $path]);
             break;
     }
