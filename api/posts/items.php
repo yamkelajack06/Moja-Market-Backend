@@ -150,41 +150,42 @@
             return new Response(true, "Item deleted successfully");
         }
 
-        public static function getItemDetails($itemID) {
-            try {
-                $query = "SELECT item.*, Image.image_id, Image.image_data 
-                        FROM item 
-                        JOIN Image ON item.item_id = Image.item_id 
-                        WHERE item.item_id = '" . $itemID . "'";
-                        
-                $result = Database::queryDatabase($query);
-
-                if (!$result) {
-                    return new Response(false, "Item not found");  //item not found
-                } else {
-                    $rows = pg_fetch_all($result);
-                    $item_details = json_encode($rows);
-                    return new Response(true, "Item found", $rows); 
-                }
-            } catch (Exception $e) {
-                return new Response(false, $e -> getMessage());
-            }
+         public static function getItemDetails($itemID) {
+    try {
+        $query = "SELECT item.*, Image.image_id, Image.image_data, users.name, users.surname, users.username 
+                  FROM item 
+                  LEFT JOIN Image ON item.item_id = Image.item_id 
+                  LEFT JOIN users ON item.user_id = users.user_id
+                  WHERE item.item_id = '" . $itemID . "'";
+                  
+        $result = Database::queryDatabase($query);
+        if (!$result) {
+            return new Response(false, "Item not found");
+        } else {
+            $rows = pg_fetch_all($result);
+            return new Response(true, "Item found", $rows ? $rows : []);
         }
+    } catch (Exception $e) {
+        return new Response(false, $e->getMessage());
+    }
+}
 
         public static function getFeed() {
             try {
-                $query = "SELECT * FROM item";
+                $query = "SELECT item.*, Image.image_id, Image.image_data, users.name, users.surname, users.username 
+                          FROM item 
+                          LEFT JOIN Image ON item.item_id = Image.item_id
+                          LEFT JOIN users ON item.user_id = users.user_id";
+                          
                 $result = Database::queryDatabase($query);
-
                 if ($result) {
-                    $rows = pg_fetch_all($result);
+                    $rows = pg_fetch_all($result) ?: [];
                     return new Response(true, "Feed loaded", $rows);
                 } else {
-                    return new Response(false, "Failed to load feed" []);
+                    return new Response(false, "Failed to load feed", []);
                 }
-
             } catch (Exception $e) {
-                return new Response(false, $e -> getMessage());
+                return new Response(false, $e->getMessage());
             }
         }
 
@@ -231,3 +232,4 @@
             }
         }
     }
+

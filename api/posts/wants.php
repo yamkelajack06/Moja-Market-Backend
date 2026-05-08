@@ -114,38 +114,40 @@
             return new Response(true, "Item deleted successfully");
         }
 
-        public static function getWantRequestDetails($wantsID) {
+         public static function getWantRequestDetails($wantsID) {
             try {
-        
-                $query = "SELECT * FROM wantrequest WHERE wants_id = '" . $wantsID . "'";
+                $query = "SELECT wantrequest.*, users.name, users.surname, users.username 
+                          FROM wantrequest 
+                          LEFT JOIN users ON wantrequest.user_id = users.user_id
+                          WHERE wantrequest.wants_id = '" . $wantsID . "'";
+                          
                 $result = Database::queryDatabase($query);
-
                 if (!$result) {
-                    return new Response(false,"want request not found");
+                    return new Response(false, "want request not found");
                 } else {
                     $rows = pg_fetch_all($result);
-                    $want_request_details = json_encode($rows);
-                    return new Response(true, "Want request found",$rows);
+                    return new Response(true, "Want request found", $rows);
                 }
             } catch (Exception $e) {
-                return new Response(false,$e -> getMessage());
+                return new Response(false, $e->getMessage());
             }
         }
 
         public function getWantRequestFeed() {
             try {
-                $query = "SELECT * FROM wantrequest";
+                $query = "SELECT wantrequest.*, users.name, users.surname, users.username 
+                          FROM wantrequest
+                          LEFT JOIN users ON wantrequest.user_id = users.user_id";
+                          
                 $result = Database::queryDatabase($query);
-
                 if ($result) {
-                    $rows = pg_fetch_all($result);
-                    return new Response(true,"Want request feed loaded",$rows);
+                    $rows = pg_fetch_all($result) ?: [];
+                    return new Response(true, "Want request feed loaded", $rows);
                 } else {
-                    return new Response(false,"Failed to load want request feed");
+                    return new Response(false, "Failed to load want request feed");
                 }
-
             } catch (Exception $e) {
-                return new Response(false,$e -> getMessage());
+                return new Response(false, $e->getMessage());
             }
         }
     }

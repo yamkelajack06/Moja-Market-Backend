@@ -20,18 +20,6 @@ $password = 'Test@1234';
 echo "=== STARTING MOJA MARKET API TESTS ===\n\n";
 
 // --- AUTH TESTS ---
-$registerJson1 = json_encode(['userID' => $u1_id, 'name' => 'Yamkela', 'surname' => 'Jack', 'username' => $u1_uname, 'email' => $u1_email, 'password' => $password]);
-$register1 = Register::registerUser($registerJson1);
-echo "REGISTER 1: " . $register1->getMessage() . PHP_EOL;
-
-$registerJson2 = json_encode(['userID' => $u2_id, 'name' => 'Lebo', 'surname' => 'Mokoena', 'username' => $u2_uname, 'email' => $u2_email, 'password' => $password]);
-$register2 = Register::registerUser($registerJson2);
-echo "REGISTER 2: " . $register2->getMessage() . PHP_EOL;
-
-$registerJson3 = json_encode(['userID' => $u3_id, 'name' => 'Sipho', 'surname' => 'Dlamini', 'username' => $u3_uname, 'email' => $u3_email, 'password' => $password]);
-$register3 = Register::registerUser($registerJson3);
-echo "REGISTER 3: " . $register3->getMessage() . PHP_EOL;
-
 $login1 = Login::login($u1_email, $password);
 echo "LOGIN 1: " . $login1->getMessage() . PHP_EOL;
 
