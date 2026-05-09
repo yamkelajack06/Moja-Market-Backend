@@ -9,6 +9,7 @@ require_once __DIR__ . '/api/posts/wants.php';
 require_once __DIR__ . '/api/user/profile.php';
 require_once __DIR__ . '/api/user/listings.php';
 require_once __DIR__ . '/api/user/want_requests.php';
+require_once __DIR__ . '/api/chat/messages.php';
 
 // Generate Unique User Variables
 $u1_id = uniqid('user_'); $u1_email = $u1_id . '@test.com'; $u1_uname = 'u_' . uniqid();
@@ -117,3 +118,84 @@ echo "GET WANT REQUESTS 2: " . json_encode(WantRequest::getUserWantRequests($u2_
 echo "GET WANT REQUESTS 3: " . json_encode(WantRequest::getUserWantRequests($u3_id)->toArray()) . PHP_EOL;
 
 echo "\n=== TESTS COMPLETED ===\n";
+
+// CHAT TESTS
+
+echo "\n=== CHAT TESTS ===\n";
+
+$chat_id = uniqid('chat_');
+
+// TESTING CREATE CHAT
+$chatJson = json_encode([
+    'chatID' => $chat_id,
+    'user1' => $u1_id,
+    'user2' => $u2_id,
+    'itemID' => $item1_id,
+    'wantID' => null
+]);
+
+$createChat = Messages::createChat($chatJson);
+
+echo "CREATE CHAT: " . $createChat->getMessage() . PHP_EOL;
+
+// TESTING FIRST SEND MESSAGE 
+
+$msg1 = json_encode([
+    'messageID' => uniqid('msg_'),
+    'chatID' => $chat_id,
+    'senderID' => $u1_id,
+    'message' => 'Hi, is the Samsung S21 Ultra still available?'
+]);
+
+$send1 = Messages::sendMessage($msg1);
+
+echo "SEND MESSAGE 1: " . $send1->getMessage() . PHP_EOL;
+
+// TESTING SECOND SEND MESSAGE 
+
+$msg2 = json_encode([
+    'messageID' => uniqid('msg_'),
+    'chatID' => $chat_id,
+    'senderID' => $u2_id,
+    'message' => 'Yes it is still available.'
+]);
+
+$send2 = Messages::sendMessage($msg2);
+
+echo "SEND MESSAGE 2: " . $send2->getMessage() . PHP_EOL;
+
+// TESTING 3rd SEND MESSAGE
+
+$msg3 = json_encode([
+    'messageID' => uniqid('msg_'),
+    'chatID' => $chat_id,
+    'senderID' => $u1_id,
+    'message' => 'Can you negotiate the price a little?'
+]);
+
+$send3 = Messages::sendMessage($msg3);
+
+echo "SEND MESSAGE 3: " . $send3->getMessage() . PHP_EOL;
+ 
+// GET CHAT HISTORY
+
+$history = Messages::getChatHistory($chat_id);
+
+echo "CHAT HISTORY: " . json_encode($history->toArray()) . PHP_EOL;
+
+// SHORT POLLING TEST
+
+$lastTime = '2000-01-01 00:00:00';
+
+$newMessages = Messages::getMessages(
+    $chat_id,
+    $lastTime
+);
+
+echo "NEW MESSAGES: " . json_encode($newMessages->toArray()) . PHP_EOL;
+
+// GET USER CHATS
+
+$userChats = Messages::getUserChats($u1_id);
+
+echo "USER CHATS: " . json_encode($userChats->toArray()) . PHP_EOL;
