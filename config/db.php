@@ -17,8 +17,7 @@ class Database {
             if (!self::$conn) {
                 throw new Exception("Connection failed.");
             }
-
-            echo "Database connection successful";
+            
             return self::$conn;
 
         } catch (Exception $e) {

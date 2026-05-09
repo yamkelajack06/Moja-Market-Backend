@@ -52,4 +52,39 @@
 
             return false;
         }
+
+          public static function getChatByItem(string $user1, string $user2, string $itemID) {
+            $query = "SELECT chat_id FROM Chat
+                      WHERE ((user_1 = '" . $user1 . "' AND user_2 = '" . $user2 . "')
+                          OR (user_1 = '" . $user2 . "' AND user_2 = '" . $user1 . "'))
+                      AND item_id = '" . $itemID . "'
+                      LIMIT 1";
+ 
+            $result = Database::queryDatabase($query);
+ 
+            if ($result && pg_num_rows($result) > 0) {
+                $row = pg_fetch_assoc($result);
+                return $row['chat_id'];
+            }
+ 
+            return null;
+        }
+ 
+        //checks if a chat already exists between two users for the same want request
+        public static function getChatByWant(string $user1, string $user2, string $wantID) {
+            $query = "SELECT chat_id FROM Chat
+                      WHERE ((user_1 = '" . $user1 . "' AND user_2 = '" . $user2 . "')
+                          OR (user_1 = '" . $user2 . "' AND user_2 = '" . $user1 . "'))
+                      AND want_id = '" . $wantID . "'
+                      LIMIT 1";
+ 
+            $result = Database::queryDatabase($query);
+ 
+            if ($result && pg_num_rows($result) > 0) {
+                $row = pg_fetch_assoc($result);
+                return $row['chat_id'];
+            }
+ 
+            return null;
+        }
     }

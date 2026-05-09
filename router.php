@@ -10,6 +10,7 @@ require_once __DIR__ . '/api/posts/wants.php';
 require_once __DIR__ . '/api/user/profile.php';
 require_once __DIR__ . '/api/user/listings.php';
 require_once __DIR__ . '/api/user/want_requests.php';
+require_once __DIR__ . '/api/chat/messages.php';
 
 function route($method, $uri) {
     $path = parse_url($uri, PHP_URL_PATH);
@@ -85,6 +86,33 @@ function route($method, $uri) {
         case '/api/upload':
             require_once __DIR__ . '/api/upload/upload_image.php';
             echo json_encode(ImageUpload::uploadImage()->toArray());
+            break;
+
+        case '/api/chat/create':
+            $json = file_get_contents('php://input');
+            echo json_encode(Messages::createChat($json)->toArray());
+            break;
+
+        case '/api/chat/send':
+            $json = file_get_contents('php://input');
+            echo json_encode(Messages::sendMessage($json)->toArray());
+            break;
+
+        case '/api/chat/history':
+            $chatID = $_GET['chatID'] ?? '';
+            echo json_encode(Messages::getChatHistory($chatID)->toArray());
+            break;
+
+        case '/api/chat/messages':
+            $chatID   = $_GET['chatID']   ?? '';
+            $lastTime = $_GET['lastTime'] ?? '2000-01-01 00:00:00';
+            echo json_encode(Messages::getNewMessages($chatID, $lastTime)->toArray());
+            break;
+
+        case '/api/chat/list':
+            $body   = json_decode(file_get_contents('php://input'), true);
+            $userID = $body['userID'] ?? '';
+            echo json_encode(Messages::getUserChats($userID)->toArray());
             break;
 
         default:
