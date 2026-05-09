@@ -20,7 +20,7 @@ try {
 
     $response = Messages::getUserChats($userID);
 
-    echo json_encode($response);
+    echo json_encode($response->toArray());
 
 } catch(Exception $e) {
 
