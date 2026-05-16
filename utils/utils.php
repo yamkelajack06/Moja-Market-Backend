@@ -87,4 +87,24 @@
  
             return null;
         }
+
+        public static function checkUsernameOrEmailTaken(string $username, string $email, string $excludeUserID) {
+            $usernameTaken = Database::queryDatabase(
+            "SELECT 1 FROM users WHERE username = '" . $username . "' AND user_id != '" . $excludeUserID . "'"
+            );
+
+            if ($usernameTaken && pg_num_rows($usernameTaken) > 0) {
+                return new Response(false, "Username is already taken");
+            }
+
+            $emailTaken = Database::queryDatabase(
+            "SELECT 1 FROM users WHERE email = '" . $email . "' AND user_id != '" . $excludeUserID . "'"
+            );
+
+            if ($emailTaken && pg_num_rows($emailTaken) > 0) {
+                return new Response(false, "Email is already in use");
+            }
+
+            return new Response(true, "Available");
+        }   
     }
