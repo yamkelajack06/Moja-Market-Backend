@@ -1,7 +1,7 @@
 <?php
     require_once __DIR__ . '/../../config/db.php';
     require_once __DIR__ . '/../../response/response.php';
-    require_once __DIR__ . '/../utils/utils.php';
+    require_once __DIR__ . '/../../utils/utils.php';
 
     class UserProfile {
         public static function getUserProfile($json) {
