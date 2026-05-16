@@ -11,6 +11,7 @@ class ImageUpload {
         $file     = $_FILES['image'];
         $tmpPath  = $file['tmp_name'];
         $origName = basename($file['name']);
+
         $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         $mimeType     = mime_content_type($tmpPath);
 
@@ -27,14 +28,21 @@ class ImageUpload {
             mkdir($uploadDir, 0755, true);
         }
 
-        $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $origName);
-        $destPath = $uploadDir . $safeName;
+        // Sanitise the filename and make it unique to avoid overwrites
+        $ext      = pathinfo($origName, PATHINFO_EXTENSION);
+        $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', pathinfo($origName, PATHINFO_FILENAME));
+        $uniqueName = $safeName . '_' . uniqid() . '.' . $ext;
+        $destPath   = $uploadDir . $uniqueName;
 
         if (!move_uploaded_file($tmpPath, $destPath)) {
             return new Response(false, "Failed to save file");
         }
-        
-        $publicUrl = '/uploads/' . $safeName;
+
+        // Build a full public URL the Android app can load with Glide
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host     = $_SERVER['HTTP_HOST'];                    // e.g. "10.129.34.12:8000"
+        $publicUrl = $protocol . '://' . $host . '/uploads/' . $uniqueName;
+
         return new Response(true, $publicUrl);
     }
 }

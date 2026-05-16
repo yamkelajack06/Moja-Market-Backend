@@ -46,6 +46,17 @@ function route($method, $uri) {
             echo json_encode(ItemDatabase::getItemDetails($itemID)->toArray());
             break;
 
+        case '/api/posts/items/update':
+            $json = file_get_contents('php://input');
+            echo json_encode(ItemDatabase::updateItem($json)->toArray());
+            break;
+
+        case '/api/posts/items/delete':
+            $json = file_get_contents('php://input');
+            echo json_encode(ItemDatabase::deleteItem($json)->toArray());
+            break;
+
+
         case '/api/posts/wants':
             $json = file_get_contents('php://input');
             echo json_encode(WantsDatabase::postWantRequest($json)->toArray());
@@ -59,6 +70,16 @@ function route($method, $uri) {
             $body   = json_decode(file_get_contents('php://input'), true);
             $wantID = $body['wantsID'] ?? '';
             echo json_encode(WantsDatabase::getWantRequestDetails($wantID)->toArray());
+            break;
+
+        case '/api/posts/wants/update':
+            $json = file_get_contents('php://input');
+            echo json_encode(WantsDatabase::updateWant($json)->toArray());
+            break;
+
+        case '/api/posts/wants/delete':
+            $json = file_get_contents('php://input');
+            echo json_encode(WantsDatabase::deleteWant($json)->toArray());
             break;
 
         case '/api/user/profile':
@@ -86,33 +107,6 @@ function route($method, $uri) {
         case '/api/upload':
             require_once __DIR__ . '/api/upload/upload_image.php';
             echo json_encode(ImageUpload::uploadImage()->toArray());
-            break;
-
-        case '/api/chat/create':
-            $json = file_get_contents('php://input');
-            echo json_encode(Messages::createChat($json)->toArray());
-            break;
-
-        case '/api/chat/send':
-            $json = file_get_contents('php://input');
-            echo json_encode(Messages::sendMessage($json)->toArray());
-            break;
-
-        case '/api/chat/history':
-            $chatID = $_GET['chatID'] ?? '';
-            echo json_encode(Messages::getChatHistory($chatID)->toArray());
-            break;
-
-        case '/api/chat/messages':
-            $chatID   = $_GET['chatID']   ?? '';
-            $lastTime = $_GET['lastTime'] ?? '2000-01-01 00:00:00';
-            echo json_encode(Messages::getNewMessages($chatID, $lastTime)->toArray());
-            break;
-
-        case '/api/chat/list':
-            $body   = json_decode(file_get_contents('php://input'), true);
-            $userID = $body['userID'] ?? '';
-            echo json_encode(Messages::getUserChats($userID)->toArray());
             break;
 
         default:
