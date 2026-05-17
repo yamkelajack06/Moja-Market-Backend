@@ -17,11 +17,8 @@
             $stockStatus     = $item['stockStatus'];
             $quantity        = $item['quantity'];
             $price           = $item['price'];
-            $itemImage       = $item['itemImage'];
-            $imageID         = $itemImage['imageID'];
-            $imagePath       = $itemImage['imagePath'];
 
-            // Extra images sent as an array of URLs alongside the primary
+            // Extra images sent as an array of URLs
             $extraImages = isset($item['images']) && is_array($item['images'])
                 ? $item['images']
                 : [];
@@ -55,27 +52,16 @@
                     return new Response(false, "Failed to post item");
                 }
 
-                // Build a de-duplicated list: primary image first, then extras
-                $allUrls = [$imagePath];
                 foreach ($extraImages as $url) {
-                    if (!empty($url) && !in_array($url, $allUrls)) {
-                        $allUrls[] = $url;
-                    }
-                }
-
-                foreach ($allUrls as $url) {
+                    if (empty($url)) continue;
                     $imgResult = ItemDatabase::postImage(
                         uniqid('img_'),
                         pg_escape_string($url),
                         $itemID
                     );
 
-                    // Roll back the item if any image insert fails
                     if (!$imgResult->getSuccess()) {
-                        ItemDatabase::deleteItem(json_encode([
-                            'itemID'    => $itemID,
-                            'itemImage' => ['imageID' => $imageID]
-                        ]));
+                        ItemDatabase::deleteItem(json_encode(['itemID' => $itemID]));
                         return new Response(false, "Failed to store image: " . $url);
                     }
                 }
@@ -102,6 +88,11 @@
             $quantity        = $item['quantity'];
             $price           = $item['price'];
 
+            // Updated image URLs sent from the Android app
+            $images = isset($item['images']) && is_array($item['images'])
+                ? $item['images']
+                : [];
+
             $item_exist = Utility::checkItemExist($itemID, "item", "item_id");
 
             if (!$item_exist) {
@@ -123,9 +114,27 @@
             try {
                 $result = Database::queryDatabase($query);
 
-                if ($result) {
-                    return new Response(true, "Item updated successfully");
+                if (!$result) {
+                    return new Response(false, "Failed to update item");
                 }
+
+                // Replace all image rows for this item with the updated list
+                Database::queryDatabase("DELETE FROM Image WHERE item_id = '" . $itemID . "'");
+
+                foreach ($images as $url) {
+                    if (empty($url)) continue;
+                    $imgResult = ItemDatabase::postImage(
+                        uniqid('img_'),
+                        pg_escape_string($url),
+                        $itemID
+                    );
+
+                    if (!$imgResult->getSuccess()) {
+                        return new Response(false, "Item updated but failed to store image: " . $url);
+                    }
+                }
+
+                return new Response(true, "Item updated successfully");
 
             } catch (Exception $e) {
                 return new Response(false, "An error occurred: " . $e->getMessage());
@@ -143,7 +152,6 @@
             }
 
             try {
-                // Remove all images for this item before deleting the item row
                 Database::queryDatabase("DELETE FROM Image WHERE item_id = '" . $itemID . "'");
 
                 $result = Database::queryDatabase("DELETE FROM item WHERE item_id = '" . $itemID . "'");
@@ -161,7 +169,6 @@
 
         public static function getItemDetails($itemID) {
             try {
-                // Join images and seller info; one row per image for this item
                 $query = "SELECT item.*, Image.image_id, Image.image_data,
                                  users.name, users.surname, users.username
                           FROM item
@@ -181,7 +188,6 @@
                     return new Response(false, "Item not found");
                 }
 
-                // Collapse multiple image rows into a single item with an images array
                 $collapsed = self::collapseImageRows($rows);
                 return new Response(true, "Item found", [$collapsed]);
 
@@ -207,7 +213,6 @@
 
                 $rows = pg_fetch_all($result) ?: [];
 
-                // Group rows by item_id, collecting all image URLs per item
                 $grouped = [];
                 foreach ($rows as $row) {
                     $id = $row['item_id'];
@@ -266,7 +271,7 @@
             }
         }
 
-        // Collapses multiple JOIN rows (one per image) into a single item array
+        // Collapses multiple JOIN rows into a single item array
         private static function collapseImageRows(array $rows): array {
             $item = $rows[0];
             $item['images'] = [];
@@ -275,7 +280,6 @@
                     $item['images'][] = $row['image_data'];
                 }
             }
-            // Keep image_data as the primary image for backward compatibility
             $item['image_data'] = !empty($item['images']) ? $item['images'][0] : '';
             return $item;
         }
