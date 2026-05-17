@@ -11,6 +11,7 @@ require_once __DIR__ . '/api/user/profile.php';
 require_once __DIR__ . '/api/user/listings.php';
 require_once __DIR__ . '/api/user/want_requests.php';
 require_once __DIR__ . '/api/chat/messages.php';
+require_once __DIR__ . '/api/rating/rating.php';
 
 function route($method, $uri) {
     $path = parse_url($uri, PHP_URL_PATH);
@@ -107,7 +108,23 @@ function route($method, $uri) {
         case '/api/upload':
             require_once __DIR__ . '/api/upload/upload_image.php';
             echo json_encode(ImageUpload::uploadImage()->toArray());
+                    break;
+        case '/api/rating/submit':
+            $json = file_get_contents('php://input');
+            echo json_encode(Rating::submitRating($json)->toArray());
             break;
+
+        case '/api/rating/average':
+            $body   = json_decode(file_get_contents('php://input'), true);
+            $itemID = $body['itemID'] ?? '';
+            echo json_encode(Rating::getAverageRating($itemID)->toArray());
+            break;
+
+        case '/api/rating/count':
+            $body   = json_decode(file_get_contents('php://input'), true);
+            $itemID = $body['itemID'] ?? '';
+            echo json_encode(Rating::getNumberOfRaters($itemID)->toArray());
+            break;           
 
         default:
             http_response_code(404);
