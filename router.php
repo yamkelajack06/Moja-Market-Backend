@@ -109,6 +109,12 @@ function route($method, $uri) {
             require_once __DIR__ . '/api/upload/upload_image.php';
             echo json_encode(ImageUpload::uploadImage()->toArray());
                     break;
+
+        case '/api/upload/prod':
+            require_once __DIR__ . '/api/upload/upload_image_prod.php';
+            echo json_encode(ImageUpload::uploadImage()->toArray());
+            break;
+
         case '/api/rating/submit':
             $json = file_get_contents('php://input');
             echo json_encode(Rating::submitRating($json)->toArray());
