@@ -10,7 +10,6 @@ require_once __DIR__ . '/api/posts/wants.php';
 require_once __DIR__ . '/api/user/profile.php';
 require_once __DIR__ . '/api/user/listings.php';
 require_once __DIR__ . '/api/user/want_requests.php';
-require_once __DIR__ . '/api/chat/messages.php';
 require_once __DIR__ . '/api/rating/rating.php';
 
 function route($method, $uri) {
