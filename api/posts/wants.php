@@ -135,7 +135,7 @@
 
         public function getWantRequestFeed() {
             try {
-                $query = "SELECT wantrequest.*, users.name, users.surname, users.username 
+                $query = "SELECT wantrequest.*, users.name, users.surname, users.username, users.email
                           FROM wantrequest
                           LEFT JOIN users ON wantrequest.user_id = users.user_id";
                           

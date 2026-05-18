@@ -199,7 +199,7 @@
         public static function getFeed() {
             try {
                 $query = "SELECT item.*, Image.image_id, Image.image_data,
-                                 users.name, users.surname, users.username
+                                 users.name, users.surname, users.username, users.email
                           FROM item
                           LEFT JOIN Image ON item.item_id = Image.item_id
                           LEFT JOIN users ON item.user_id = users.user_id
