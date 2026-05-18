@@ -9,8 +9,7 @@
             $userID = $user["userID"];
 
             try {
-                $query = "SELECT * FROM users WHERE user_id = '" . $userID . "'";
-                $result = Database::queryDatabase($query);
+                $result = Database::query("SELECT * FROM users WHERE user_id = $1", [$userID]);
 
                 if (!$result) {
                     return new Response(false, "User not found");
@@ -39,15 +38,7 @@
                     return $check;
                 }
 
-                $result = Database::queryDatabase(
-                    "UPDATE users SET
-                        name     = '" . $name . "',
-                        surname  = '" . $surname . "',
-                        username = '" . $username . "',
-                        email    = '" . $email . "',
-                        password = '" . $password . "'
-                    WHERE user_id = '" . $userID . "'"
-                );
+                $result = Database::query("UPDATE users SET name = $1, surname = $2, username = $3, email = $4, password = $5 WHERE user_id = $6", [$name, $surname, $username, $email, $password, $userID]);
 
                 if (!$result) {
                     return new Response(false, "Failed to update profile");

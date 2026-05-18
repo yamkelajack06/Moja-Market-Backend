@@ -11,8 +11,7 @@
                     return new Response(false, "Invalid login credentials");
                 } 
             } catch (Exception $e) {
-                $message = $e -> getMessage();
-                return new Response($success,$message);  
+                return new Response(false,$e->getMessage());  
 
             }
 

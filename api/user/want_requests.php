@@ -4,8 +4,7 @@
     class WantRequest {
         public static function getUserWantRequests($userID) {
             try {
-                $query = "SELECT * FROM wantrequest WHERE user_id = '" . $userID . "'";
-                $result = Database::queryDatabase($query);
+                $result = Database::query("SELECT * FROM wantrequest WHERE user_id = $1", [$userID]);
 
                 if (!$result) {
                     return new Response(false, "No want requests found"); //want requests not found

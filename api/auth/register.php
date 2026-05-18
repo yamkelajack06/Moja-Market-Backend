@@ -34,8 +34,7 @@
 
             //register user if not registered already
             try {
-                $query = "INSERT INTO users (user_id, name, surname, username, email, password) VALUES ('" . $userID . "', '" . $name . "', '" . $surname . "', '" . $username . "', '" . $email . "', '" . $password . "')";
-                $result = Database::queryDatabase($query);
+                $result = Database::query("INSERT INTO users (user_id, name, surname, username, email, password, createdAt) VALUES ($1, $2, $3, $4, $5, $6, NOW())", [$userID, $name, $surname, $username, $email, $password]);
 
             } catch (Exception $e) {
                 $message = $e -> getMessage();

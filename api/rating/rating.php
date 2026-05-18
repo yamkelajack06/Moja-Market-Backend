@@ -32,17 +32,18 @@ class Rating {
             }
 
             // Check if user already rated this item
-            $alreadyRated = Database::queryDatabase(
-                "SELECT 1 FROM Rating WHERE item_id = '" . $itemID . "' AND rater = '" . $raterID . "'"
+            $alreadyRated = Database::query(
+                "SELECT 1 FROM Rating WHERE item_id = $1 AND rater = $2",
+                [$itemID, $raterID]
             );
 
             if ($alreadyRated && pg_num_rows($alreadyRated) > 0) {
                 return new Response(false, "You have already rated this item");
             }
 
-            $result = Database::queryDatabase(
-                "INSERT INTO Rating (rating_id, item_id, rating_value, rater)
-                 VALUES ('" . $ratingID . "', '" . $itemID . "', " . $ratingValue . ", '" . $raterID . "')"
+            $result = Database::query(
+                "INSERT INTO Rating (rating_id, item_id, rating_value, rater) VALUES ($1, $2, $3, $4)",
+                [$ratingID, $itemID, $ratingValue, $raterID]
             );
 
             if (!$result) {
@@ -64,10 +65,9 @@ class Rating {
                 return new Response(false, "Item not found");
             }
 
-            $result = Database::queryDatabase(
-                "SELECT ROUND(AVG(rating_value)::numeric, 1) AS average
-                 FROM Rating
-                 WHERE item_id = '" . $itemID . "'"
+            $result = Database::query(
+                "SELECT ROUND(AVG(rating_value)::numeric, 1) AS average FROM Rating WHERE item_id = $1",
+                [$itemID]
             );
 
             if (!$result) {
@@ -92,10 +92,9 @@ class Rating {
                 return new Response(false, "Item not found");
             }
 
-            $result = Database::queryDatabase(
-                "SELECT COUNT(*) AS total
-                 FROM Rating
-                 WHERE item_id = '" . $itemID . "'"
+            $result = Database::query(
+                "SELECT COUNT(*) AS total FROM Rating WHERE item_id = $1",
+                [$itemID]
             );
 
             if (!$result) {

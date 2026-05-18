@@ -4,8 +4,7 @@
     class UserListings {
         public static function getUserListings($user_id) {
             try {
-                $query = "SELECT * FROM item WHERE user_id = '" . $user_id . "'";   
-                $result = Database::queryDatabase($query);
+                $result = Database::query("SELECT * FROM item WHERE user_id = $1", [$user_id]);
 
                 if (!$result) {
                     return new Response(false, "No listings found"); //listings not found

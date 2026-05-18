@@ -24,18 +24,8 @@
             }
 
             //just insert the want request details into the database
-            $query = "INSERT INTO wantrequest (wants_id, user_id, date_posted, item_name, item_description, budget, status) VALUES (" .
-                        "'" . $wantsID . "'," .
-                        "'" . $userID . "'," .
-                        "'" . $datePosted . "'," .
-                        "'" . $itemName . "'," .
-                        "'" . $description . "'," .
-                        $budget . "," .
-                        "'" . $wantStatus . "'" .
-                        ")";
-
             try {
-                $result = Database::queryDatabase($query);
+                $result = Database::query("INSERT INTO wantrequest (wants_id, user_id, date_posted, item_name, item_description, budget, status) VALUES ($1, $2, $3, $4, $5, $6, $7)", [$wantsID, $userID, $datePosted, $itemName, $description, $budget, $wantStatus]);
 
                 if (!$result) {
                     return new Response($is_success, "Failed to post item");
@@ -62,15 +52,6 @@
             $budget = $item['budget'];
             $wantStatus = $item['wantStatus'];
 
-          $query = "UPDATE wantrequest SET
-                user_id = '" . $userID . "',
-                date_posted = '" . $datePosted . "',
-                item_name = '" . $itemName . "',
-                item_description = '" . $description . "',
-                budget = " . $budget . ",
-                status = '" . $wantStatus . "'
-                WHERE wants_id = '" . $wantsID . "'";
-
             $item_exist = Utility::checkItemExist($wantsID,"wantrequest","wants_id");
 
             if (!$item_exist) {
@@ -78,7 +59,7 @@
             }
 
             try {
-                $result = Database::queryDatabase($query);
+                $result = Database::query("UPDATE wantrequest SET user_id = $1, date_posted = $2, item_name = $3, item_description = $4, budget = $5, status = $6 WHERE wants_id = $7", [$userID, $datePosted, $itemName, $description, $budget, $wantStatus, $wantsID]);
 
                 if ($result) {
                     return new Response(true, "Item updated successfully");
@@ -98,10 +79,7 @@
             }
 
             try {
-                $is_success = false;
-
-                $query = "DELETE FROM wantrequest WHERE wants_id = '" . $wantsID . "'";
-                $result = Database::queryDatabase($query);
+                $result = Database::query("DELETE FROM wantrequest WHERE wants_id = $1", [$wantsID]);
 
                 if (!$result) {
                     return new Response($is_success, "Failed to post item");
@@ -114,32 +92,10 @@
             return new Response(true, "Item deleted successfully");
         }
 
-         public static function getWantRequestDetails($wantsID) {
-            try {
-                $query = "SELECT wantrequest.*, users.name, users.surname, users.username 
-                          FROM wantrequest 
-                          LEFT JOIN users ON wantrequest.user_id = users.user_id
-                          WHERE wantrequest.wants_id = '" . $wantsID . "'";
-                          
-                $result = Database::queryDatabase($query);
-                if (!$result) {
-                    return new Response(false, "want request not found");
-                } else {
-                    $rows = pg_fetch_all($result);
-                    return new Response(true, "Want request found", $rows);
-                }
-            } catch (Exception $e) {
-                return new Response(false, $e->getMessage());
-            }
-        }
-
         public function getWantRequestFeed() {
             try {
-                $query = "SELECT wantrequest.*, users.name, users.surname, users.username, users.email
-                          FROM wantrequest
-                          LEFT JOIN users ON wantrequest.user_id = users.user_id";
-                          
-                $result = Database::queryDatabase($query);
+                $result = Database::query("SELECT wantrequest.*, users.name, users.surname, users.username, users.email FROM wantrequest LEFT JOIN users ON wantrequest.user_id = users.user_id", []);
+                
                 if ($result) {
                     $rows = pg_fetch_all($result) ?: [];
                     return new Response(true, "Want request feed loaded", $rows);
