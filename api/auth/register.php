@@ -4,13 +4,9 @@
     require_once __DIR__ . '/../../utils/utils.php';
 
     class Register {
-        //The user take in will be a JSON object from the frontend
-
         public static function registerUser($json) {
-            //convert the json string to an associative array
             $user = json_decode($json, true);
 
-            //Assign the variables from the json
             $message  = "";
             $userID   = $user['userID'];
             $name     = $user['name'];
@@ -18,13 +14,11 @@
             $username = $user['username'];
             $email    = $user['email'];
             $password = $user['password'];
-            $success = false;
+            $success  = false;
 
-            //check if user is registered to ensure user uniqueness
             try {
-                $is_registered = Utility::checkUserExists($username,$email)-> getSuccess();
+                $is_registered = Utility::checkUserExists($username, $email)->getSuccess();
 
-                //throw error if user is already registered
                 if ($is_registered) {
                     return new Response(false, "User already exists. Use a different email and/or username");
                 }
@@ -32,12 +26,15 @@
                 return new Response(false, $e->getMessage());
             }
 
-            //register user if not registered already
-            try {
-                $result = Database::query("INSERT INTO users (user_id, name, surname, username, email, password, createdAt) VALUES ($1, $2, $3, $4, $5, $6, NOW())", [$userID, $name, $surname, $username, $email, $password]);
+            // Hash the password before storing
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
+            try {
+                $result = Database::query(
+                    "INSERT INTO users (user_id, name, surname, username, email, password, createdAt) VALUES ($1, $2, $3, $4, $5, $6, NOW())",
+                    [$userID, $name, $surname, $username, $email, $hashedPassword]
+                );
             } catch (Exception $e) {
-                $message = $e -> getMessage();
                 return new Response(false, $e->getMessage());
             }
 

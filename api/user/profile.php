@@ -5,11 +5,14 @@
 
     class UserProfile {
         public static function getUserProfile($json) {
-            $user = json_decode($json,true);
+            $user   = json_decode($json, true);
             $userID = $user["userID"];
 
             try {
-                $result = Database::query("SELECT * FROM users WHERE user_id = $1", [$userID]);
+                $result = Database::query(
+                    "SELECT user_id, name, surname, username, email, createdAt FROM users WHERE user_id = $1",
+                    [$userID]
+                );
 
                 if (!$result) {
                     return new Response(false, "User not found");
@@ -38,7 +41,13 @@
                     return $check;
                 }
 
-                $result = Database::query("UPDATE users SET name = $1, surname = $2, username = $3, email = $4, password = $5 WHERE user_id = $6", [$name, $surname, $username, $email, $password, $userID]);
+                // Hash the incoming password
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+                $result = Database::query(
+                    "UPDATE users SET name = $1, surname = $2, username = $3, email = $4, password = $5 WHERE user_id = $6",
+                    [$name, $surname, $username, $email, $hashedPassword, $userID]
+                );
 
                 if (!$result) {
                     return new Response(false, "Failed to update profile");

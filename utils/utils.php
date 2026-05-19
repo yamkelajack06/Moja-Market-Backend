@@ -1,12 +1,15 @@
 <?php
     require_once __DIR__ . '/../response/response.php';
+
     class Utility {
-        //Runs DB query to check if user exists or not for registering
         public static function checkUserExists(string $username, string $email) {
-            $result = Database::query("SELECT EXISTS (SELECT 1 FROM users WHERE username = $1 OR email = $2)", [$username, $email]);
+            $result = Database::query(
+                "SELECT EXISTS (SELECT 1 FROM users WHERE username = $1 OR email = $2)",
+                [$username, $email]
+            );
 
             if ($result != "") {
-                $rows = pg_fetch_all($result);
+                $rows   = pg_fetch_all($result);
                 $exists = $rows[0]['exists'];
 
                 if ($exists == 't') {
@@ -17,28 +20,41 @@
             }
         }
 
-        //Runs db query to check if user login details match any user in the database
         public static function getUser(string $loginID, string $password) {
+            // Fetch by username or email only
+            $result = Database::query(
+                "SELECT * FROM users WHERE username = $1 OR email = $1",
+                [$loginID]
+            );
 
-            $result = Database::query("SELECT * FROM users WHERE (username = $1 OR email = $1) AND password = $2", [$loginID, $password]);
-
-            if ($result) {
-                $rows = pg_fetch_all($result);
-
-                if (empty($rows)) {
-                    return null; // user not found
-                }
-
-                return json_encode($rows[0]);
-            } else {
+            if (!$result) {
                 throw new ErrorException("Database query failed");
             }
+
+            $rows = pg_fetch_all($result);
+
+            if (empty($rows)) {
+                return null;
+            }
+
+            $user = $rows[0];
+
+            // Verify the plain-text input against the stored bcrypt hash
+            if (!password_verify($password, $user['password'])) {
+                return null;
+            }
+
+            // Strip the password hash before sending the user object to the client
+            unset($user['password']);
+
+            return json_encode($user);
         }
 
-        //checks if a post with the same ID already exists just in case to prevent duplication
         public static function checkItemExist(string $item_id, string $table, string $id) {
-
-            $result = Database::query("SELECT EXISTS (SELECT 1 FROM $table WHERE $id = $1)", [$item_id]);
+            $result = Database::query(
+                "SELECT EXISTS (SELECT 1 FROM $table WHERE $id = $1)",
+                [$item_id]
+            );
 
             if ($result) {
                 $rows = pg_fetch_all($result);
@@ -68,5 +84,5 @@
             }
 
             return new Response(true, "Available");
-        }         
+        }
     }
