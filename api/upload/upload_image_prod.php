@@ -45,7 +45,7 @@ class ImageUpload {
             $dataUri   = 'data:' . $mimeType . ';base64,' . $base64;
             $uploadUrl = 'https://api.cloudinary.com/v1_1/' . $cloudName . '/image/upload';
 
-            // Use cURL for the upload — more reliable than file_get_contents for external calls
+            // Use cURL for the upload 
             $ch = curl_init($uploadUrl);
 
             curl_setopt_array($ch, [

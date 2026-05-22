@@ -113,32 +113,6 @@
             }
         }
 
-        public static function deleteItem($json) {
-            $item   = json_decode($json, true);
-            $itemID = $item['itemID'];
-
-            $item_exist = Utility::checkItemExist($itemID, "item", "item_id");
-
-            if (!$item_exist) {
-                return new Response(false, "Item to delete not found");
-            }
-
-            try {
-                Database::query("DELETE FROM Image WHERE item_id = '" . $itemID . "'");
-
-                $result = Database::query("DELETE FROM item WHERE item_id = $1", [$itemID]);
-
-                if (!$result) {
-                    return new Response(false, "Failed to delete item");
-                }
-
-            } catch (Exception $e) {
-                return new Response(false, "An error occurred: " . $e->getMessage());
-            }
-
-            return new Response(true, "Item deleted successfully");
-        }
-
         public static function getFeed() {
             try {
                 $result = Database::query("SELECT item.*, Image.image_id, Image.image_data, users.name, users.surname, users.username, users.email FROM item LEFT JOIN Image ON item.item_id = Image.item_id LEFT JOIN users ON item.user_id = users.user_id ORDER BY item.date_posted DESC", []);
@@ -184,26 +158,34 @@
             }
         }
 
-        public static function deleteImage($imageID) {
+        public static function deleteItem($json) {
+            $item   = json_decode($json, true);
+            $itemID = $item['itemID'];
+
+            $item_exist = Utility::checkItemExist($itemID, "item", "item_id");
+
+            if (!$item_exist) {
+                return new Response(false, "Item to delete not found");
+            }
+
             try {
-                $image_exist = Utility::checkItemExist($imageID, "Image", "image_id");
+                Database::query("DELETE FROM Image WHERE item_id = '" . $itemID . "'");
 
-                if (!$image_exist) {
-                    return new Response(false, "Image to delete not found");
-                }
+                // Delete ratings for this item before deleting the item itself
+                Database::query("DELETE FROM Rating WHERE item_id = '" . $itemID . "'");
 
-                $result = Database::query("DELETE FROM Image WHERE image_id = $1", [$imageID]);
+                $result = Database::query("DELETE FROM item WHERE item_id = $1", [$itemID]);
 
                 if (!$result) {
-                    return new Response(false, "Failed to delete image");
+                    return new Response(false, "Failed to delete item");
                 }
-
-                return new Response(true, "Image deleted successfully");
 
             } catch (Exception $e) {
                 return new Response(false, "An error occurred: " . $e->getMessage());
             }
-        }
+
+            return new Response(true, "Item deleted successfully");
+        }       
 
         // Collapses multiple JOIN rows into a single item array
         private static function collapseImageRows(array $rows): array {
